@@ -5,13 +5,13 @@ using B1.Event;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace B1.UIWindow
+namespace B1.UI
 {
     public abstract class UIWindowPage : Base, IUIWindowPage
     {
         public abstract UniTask<List<(EWindow eWindow, EUIRoot root)>> GetWindowNameAsync();
 
-        Dictionary<EWindow, UIWindow> m_DicWindow = new();
+        private Dictionary<EWindow, UIWindow> m_DicWindow = new();
         public async UniTask InitAsync()
         {
             var windowList = await GetWindowNameAsync();
@@ -28,6 +28,7 @@ namespace B1.UIWindow
                             if (window != null)
                             {
                                 await window.InitAsync();
+                                m_DicWindow.Add(windowInfo.eWindow, window);
                                 EventManager.Instance.FireEvent(EEvent.UI_WINDOW_LOAD_FINISH, window, windowInfo.ToString());
                             }
                             else

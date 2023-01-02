@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using B1.UIWindow;
+using B1.UI;
 using UnityEngine;
 
 namespace B1
@@ -13,7 +13,7 @@ namespace B1
         {
             var uiManagerPath = $"{PathManager.UIWindow}UGUISystem.prefab";
             await AssetsManager.Instance.LoadPrefabAsync<UGUISystem>(uiManagerPath, null);
-            var window = await UIWindowManager.Instance.LoadWindowAsync(EWindow.UILogin, EUIRoot.App1);
+            await UIWindowManager.Instance.OpenPageAsync<UILobbyPage>();
         }
     }
 }

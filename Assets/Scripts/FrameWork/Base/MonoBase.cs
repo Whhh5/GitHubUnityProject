@@ -14,5 +14,9 @@ namespace B1
         {
             Debug.LogError($" 【 {GetType()} 】\n{message}");
         }
+        public void LogWarning<T>(T message)
+        {
+            Debug.LogWarning($" 【 {GetType()} 】\n{message}");
+        }
     }
 }

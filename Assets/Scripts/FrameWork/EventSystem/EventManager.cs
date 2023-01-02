@@ -25,7 +25,7 @@ namespace B1.Event
             }
             else
             {
-                LogError($"当前事件未注册 event name = {f_EEvent}");
+                LogWarning($"当前事件未注册 event name = {f_EEvent}");
             }
             LogEvent();
         }
@@ -37,11 +37,11 @@ namespace B1.Event
             }
             if (m_DicEvent[f_EEvent].Contains((f_Layer, f_Function)))
             {
-                Log($"重复添加事件 event name = {f_EEvent},   layer = {f_Layer}");
+                LogError($"重复添加事件 event name = {f_EEvent},   layer = {f_Layer}");
                 return;
             }
             m_DicEvent[f_EEvent].Add((f_Layer, f_Function));
-            Log($"订阅事件   event name = {f_EEvent}   layer = {f_Layer}");
+            LogWarning($"订阅事件   event name = {f_EEvent}   layer = {f_Layer}");
             LogEvent();
         }
         public void Unsubscribe(EEvent f_EEvent, Action<EEvent, object, (string layer, string des)> f_function, string f_Layer)
@@ -56,11 +56,11 @@ namespace B1.Event
                 {
                     m_DicEvent.Remove(f_EEvent);
                 }
-                Log($"取消订阅事件 event name = {f_EEvent},   layer = {f_Layer}");
+                LogWarning($"取消订阅事件 event name = {f_EEvent},   layer = {f_Layer}");
             }
             else
             {
-                Log($"取消订阅事件, 不存在该事件 event name = {f_EEvent},   layer = {f_Layer}");
+                LogError($"取消订阅事件, 不存在该事件 event name = {f_EEvent},   layer = {f_Layer}");
             }
             LogEvent();
         }
@@ -76,14 +76,14 @@ namespace B1.Event
                     str += $"\n\t event layer = {item.layer} ";
                 }
                 str += "\n}";
-                Log(str);
+                LogWarning(str);
                 #endregion
 
                 m_DicEvent.Remove(f_EEvent);
             }
             else
             {
-                Log($"当前事件未注册 event name = {f_EEvent}");
+                LogError($"当前事件未注册 event name = {f_EEvent}");
             }
             LogEvent();
         }
@@ -106,7 +106,7 @@ namespace B1.Event
                 }
                 str += $"\n}}";
             }
-            Log(str);
+            LogWarning(str);
         }
     }
 }

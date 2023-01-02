@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using B1;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using System.Reflection;
 
-namespace B1.UIWindow
+namespace B1.UI
 {
     public sealed class UIWindowManager : MonoSingleton<UIWindowManager>
     {
@@ -46,6 +47,33 @@ namespace B1.UIWindow
             {
                 Log($"重复开启 UI Window Page 已经被打开  key = {key}   value = {value}");
             }
+        }
+        public void OpenPageAsync(Type f_Type)
+        {
+            if (!m_WindowStack.TryGetValue(f_Type, out var value))
+            {
+                var window = Activator.CreateInstance(f_Type);
+                m_WindowStack.Push(f_Type, window as UIWindowPage);
+                Log($"开始加载 UI Window Page    page name = {f_Type}");
+                var method_InitAsync = f_Type.GetMethod("InitAsync", BindingFlags.Default | BindingFlags.Instance | BindingFlags.Public);
+                method_InitAsync.Invoke(window, new object[] { });
+            }
+            else
+            {
+                Log($"重复开启 UI Window Page 已经被打开  key = {f_Type}   value = {value}");
+            }
+            //var key = typeof(T);
+            //if (!m_WindowStack.TryGetValue(key, out var value))
+            //{
+            //    T window = new();
+            //    m_WindowStack.Push(key, window);
+            //    Log($"开始加载 UI Window Page    page name = {typeof(T)}");
+            //    await window.InitAsync();
+            //}
+            //else
+            //{
+            //    Log($"重复开启 UI Window Page 已经被打开  key = {key}   value = {value}");
+            //}
         }
         public async UniTask ClosePageAsync()
         {

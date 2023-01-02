@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace B1.UIWindow
+namespace B1.UI
 {
     public abstract class UIWindow : MonoBase
     {
