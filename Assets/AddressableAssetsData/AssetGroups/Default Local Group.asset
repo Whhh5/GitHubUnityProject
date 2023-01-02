@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 09a3cb1ea192e401497f6d08514b33ef
+  m_SerializeEntries:
+  - m_GUID: fc16562513c804ba3bd4385f8ef93285
+    m_Address: Assets/ARSBPath/Prefabs/UI/UGUISystem.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 6fbbd8e9661bc41a892d36f2c6fad1a5
+    m_Address: Assets/ARSBPath/Prefabs/UI/UILogin.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 056db3dee3486459a9eb7c3820ef1dcd, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 1868c1407e3234fa19228c0f5fce0fc7, type: 2}
+    - {fileID: 11400000, guid: 90454106c08dd4c7291314bd3bfac14c, type: 2}

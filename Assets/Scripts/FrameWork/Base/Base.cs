@@ -1,0 +1,19 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace B1
+{
+    public class Base : Log
+    {
+        public void Log<T>(T message)
+        {
+            Debug.Log($" 【 {GetType()} 】\n{message}");
+        }
+
+        public void LogError<T>(T message)
+        {
+            Debug.LogError($" 【 {GetType()} 】\n{message}");
+        }
+    }
+}
