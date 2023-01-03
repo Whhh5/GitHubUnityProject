@@ -1,0 +1,239 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!128 &12800000
+Font:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: beijibaoji_0
+  serializedVersion: 5
+  m_LineSpacing: 0.1
+  m_DefaultMaterial: {fileID: 2100000, guid: 1a20797f27afa774c8e5b2a5c7e1f843, type: 2}
+  m_FontSize: 0
+  m_Texture: {fileID: 0}
+  m_AsciiStartOffset: 0
+  m_Tracking: 1
+  m_CharacterSpacing: 0
+  m_CharacterPadding: 1
+  m_ConvertCase: 0
+  m_CharacterRects:
+  - serializedVersion: 2
+    index: 48
+    uv:
+      serializedVersion: 2
+      x: 0.325
+      y: 1
+      width: 0.0625
+      height: -0.7692308
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 15
+      height: 20
+    advance: 15
+    flipped: 0
+  - serializedVersion: 2
+    index: 49
+    uv:
+      serializedVersion: 2
+      x: 0.9125
+      y: 1
+      width: 0.0375
+      height: -0.7307692
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 9
+      height: 19
+    advance: 9
+    flipped: 0
+  - serializedVersion: 2
+    index: 50
+    uv:
+      serializedVersion: 2
+      x: 0.39166668
+      y: 1
+      width: 0.0625
+      height: -0.7692308
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 15
+      height: 20
+    advance: 15
+    flipped: 0
+  - serializedVersion: 2
+    index: 51
+    uv:
+      serializedVersion: 2
+      x: 0.725
+      y: 1
+      width: 0.058333334
+      height: -0.7692308
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 14
+      height: 20
+    advance: 14
+    flipped: 0
+  - serializedVersion: 2
+    index: 52
+    uv:
+      serializedVersion: 2
+      x: 0.45833334
+      y: 1
+      width: 0.0625
+      height: -0.7692308
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 15
+      height: 20
+    advance: 15
+    flipped: 0
+  - serializedVersion: 2
+    index: 53
+    uv:
+      serializedVersion: 2
+      x: 0.7875
+      y: 1
+      width: 0.058333334
+      height: -0.7307692
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 14
+      height: 19
+    advance: 14
+    flipped: 0
+  - serializedVersion: 2
+    index: 54
+    uv:
+      serializedVersion: 2
+      x: 0.525
+      y: 1
+      width: 0.0625
+      height: -0.7692308
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 15
+      height: 20
+    advance: 15
+    flipped: 0
+  - serializedVersion: 2
+    index: 55
+    uv:
+      serializedVersion: 2
+      x: 0.85
+      y: 1
+      width: 0.058333334
+      height: -0.7307692
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 14
+      height: 19
+    advance: 14
+    flipped: 0
+  - serializedVersion: 2
+    index: 56
+    uv:
+      serializedVersion: 2
+      x: 0.59166664
+      y: 1
+      width: 0.0625
+      height: -0.7692308
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 15
+      height: 20
+    advance: 15
+    flipped: 0
+  - serializedVersion: 2
+    index: 57
+    uv:
+      serializedVersion: 2
+      x: 0.65833336
+      y: 1
+      width: 0.0625
+      height: -0.7692308
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 15
+      height: 20
+    advance: 15
+    flipped: 0
+  - serializedVersion: 2
+    index: 20987
+    uv:
+      serializedVersion: 2
+      x: 0
+      y: 1
+      width: 0.104166664
+      height: -0.96153843
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 25
+      height: 25
+    advance: 25
+    flipped: 0
+  - serializedVersion: 2
+    index: 26292
+    uv:
+      serializedVersion: 2
+      x: 0.108333334
+      y: 1
+      width: 0.104166664
+      height: -0.96153843
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 25
+      height: 25
+    advance: 25
+    flipped: 0
+  - serializedVersion: 2
+    index: 32972
+    uv:
+      serializedVersion: 2
+      x: 0.21666667
+      y: 1
+      width: 0.104166664
+      height: -0.96153843
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 25
+      height: 25
+    advance: 25
+    flipped: 0
+  m_KerningValues: []
+  m_PixelScale: 0.1
+  m_FontData: 
+  m_Ascent: 0
+  m_Descent: 0
+  m_DefaultStyle: 0
+  m_FontNames: []
+  m_FallbackFonts: []
+  m_FontRenderingMode: 0
+  m_UseLegacyBoundsCalculation: 0
+  m_ShouldRoundAdvanceValue: 1

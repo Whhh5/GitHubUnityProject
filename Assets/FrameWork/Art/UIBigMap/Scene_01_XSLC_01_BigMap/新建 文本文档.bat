@@ -1,0 +1,18 @@
+
+ren Scene_01_XSLC_01_BigMap_01.png Scene_01_XSLC_01_BigMap_0.png
+ren Scene_01_XSLC_01_BigMap_02.png Scene_01_XSLC_01_BigMap_1.png
+ren Scene_01_XSLC_01_BigMap_03.png Scene_01_XSLC_01_BigMap_2.png
+ren Scene_01_XSLC_01_BigMap_04.png Scene_01_XSLC_01_BigMap_3.png
+ren Scene_01_XSLC_01_BigMap_05.png Scene_01_XSLC_01_BigMap_4.png
+ren Scene_01_XSLC_01_BigMap_06.png Scene_01_XSLC_01_BigMap_5.png
+ren Scene_01_XSLC_01_BigMap_07.png Scene_01_XSLC_01_BigMap_6.png
+ren Scene_01_XSLC_01_BigMap_08.png Scene_01_XSLC_01_BigMap_7.png
+ren Scene_01_XSLC_01_BigMap_09.png Scene_01_XSLC_01_BigMap_8.png
+ren Scene_01_XSLC_01_BigMap_10.png Scene_01_XSLC_01_BigMap_9.png
+ren Scene_01_XSLC_01_BigMap_11.png Scene_01_XSLC_01_BigMap_10.png
+ren Scene_01_XSLC_01_BigMap_12.png Scene_01_XSLC_01_BigMap_11.png
+ren Scene_01_XSLC_01_BigMap_13.png Scene_01_XSLC_01_BigMap_12.png
+ren Scene_01_XSLC_01_BigMap_14.png Scene_01_XSLC_01_BigMap_13.png
+ren Scene_01_XSLC_01_BigMap_15.png Scene_01_XSLC_01_BigMap_14.png
+ren Scene_01_XSLC_01_BigMap_16.png Scene_01_XSLC_01_BigMap_15.png
+

@@ -1,0 +1,8 @@
+info face="汉仪润圆-65W" size=32 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
+common lineHeight=32 base=24 scaleW=104 scaleH=28 pages=1 packed=1 alphaChnl=1 redChnl=0 greenChnl=0 blueChnl=0
+page id=0 file="wenzi_0.png"
+chars count=4
+char id=20813 x=0     y=0     width=25    height=25    xoffset=0     yoffset=0     xadvance=25    page=0  chnl=15
+char id=30123 x=26    y=0     width=25    height=25    xoffset=0     yoffset=0     xadvance=25    page=0  chnl=15
+char id=36991 x=52    y=0     width=25    height=25    xoffset=0     yoffset=0     xadvance=25    page=0  chnl=15
+char id=38378 x=78    y=0     width=23    height=25    xoffset=0     yoffset=0     xadvance=23    page=0  chnl=15
