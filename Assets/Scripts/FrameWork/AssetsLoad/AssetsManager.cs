@@ -13,18 +13,7 @@ namespace B1
         Dictionary<string, (Type type, object assets, List<GameObject> objs)> m_DicAssets = new();
         public async UniTask<T> LoadAsync<T>(string f_Path) where T : class
         {
-            var size = await Addressables.GetDownloadSizeAsync(f_Path);
-            Log($"{size}");
-            await Addressables.DownloadDependenciesAsync(f_Path);
-            //GameObject o = await Addressables.LoadAssetAsync<GameObject>(f_Path);
-            //T asset = await Addressables.LoadAssetAsync<T>(f_Path);
-
             var asset = await Addressables.LoadAssetAsync<GameObject>(f_Path);
-            //handle += (Handheld) =>
-            //{
-            //    Log($" handle = {Handheld.Status}");
-            //};
-
             #region Console
             var color = asset != null ? "00FF00FF" : "FF0000FF";
             Log($"加载资源  result = {asset != null}   <color=#{color}>path = {f_Path} </color>   ");
