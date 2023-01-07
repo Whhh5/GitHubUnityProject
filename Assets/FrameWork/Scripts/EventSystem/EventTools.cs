@@ -6,6 +6,7 @@ namespace B1.Event
 {
     public enum EEvent
     {
+        None,
         SCENE_LOAD_START,
         SCENE_LOAD_FINISH,
         /// <summary>
@@ -20,5 +21,14 @@ namespace B1.Event
         UI_WINDOW_SHOW,
         UI_WINDOW_HIDE,
         EnumCount,
+    }
+    public interface IEventReception<TUserData>
+    {
+        delegate void tyyu();
+        void EventReception(EEvent eEvent)
+        {
+            Debug.Log("2222");
+        }
+        void LLL();
     }
 }

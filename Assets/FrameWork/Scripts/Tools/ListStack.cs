@@ -68,6 +68,15 @@ public class ListStack<T> : Base
 
 public class ListStack<TKey, TValue> : Base
 {
+    public TValue this[TKey key]
+    {
+        get
+        {
+            return m_Dic[key];
+        }
+    }
+
+
     private string m_Message = null;
     public ListStack(string f_Message, uint count = 10)
     {

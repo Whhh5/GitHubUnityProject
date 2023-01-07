@@ -14,6 +14,13 @@ namespace B1.UI
         private Dictionary<EWindow, UIWindow> m_DicWindow = new();
         public async UniTask InitAsync()
         {
+            var fieldInfo = typeof(EUIWindowPage).GetField($"{GetType()}");
+            if (fieldInfo == null)
+            {
+                Debug.Log($"当前配置类型获取失败   请到  EUIWindowPage 中注册");
+            }
+            var pageType = (EUIWindowPage)fieldInfo.GetValue(null);
+
             var windowList = await GetWindowNameAsync();
             if (windowList != null && windowList.Count > 0)
             {
@@ -24,32 +31,42 @@ namespace B1.UI
                     tasks[i] = UniTask.Create(
                         async () =>
                         {
-                            var window = await UIWindowManager.Instance.LoadWindowAsync(windowInfo.eWindow, windowInfo.root);
+                            var window = await UIWindowManager.Instance.LoadWindowAsync<UIWindow>(windowInfo.eWindow, windowInfo.root);
                             if (window != null)
                             {
-                                await window.InitAsync();
+                                window.gameObject.SetActive(false);
+                                window.m_CurPage = this;
+                                window.m_CurentPageType = pageType;
+                                await window.AwakeAsync();
                                 m_DicWindow.Add(windowInfo.eWindow, window);
                                 EventManager.Instance.FireEvent(EEvent.UI_WINDOW_LOAD_FINISH, window, windowInfo.ToString());
                             }
                             else
                             {
+                                
                             }
                         });
                 }
                 await UniTask.WhenAll(tasks);
-                await HideAllAsync();
                 await ShowAsync(windowList[0].eWindow);
             }
             else
             {
-                Log("UIPage 打开失败");
+                Log("UIPage 打开失败  未获取到当前 page 的窗口   请重写函数并返回 GetWindowNameAsync()");
             }
         }
         public async UniTask ShowAsync(EWindow f_Window)
         {
-            var window = m_DicWindow[f_Window];
-            await window.ShowAsync();
-            EventManager.Instance.FireEvent(EEvent.UI_WINDOW_HIDE, window, f_Window.ToString());
+            try
+            {
+                var window = m_DicWindow[f_Window];
+                await window.ShowAsync();
+                EventManager.Instance.FireEvent(EEvent.UI_WINDOW_HIDE, window, f_Window.ToString());
+            }
+            catch (Exception)
+            {
+                LogError($"窗口不存在当前 page 中     f_Window = {f_Window}");
+            }
         }
         public async UniTask HideAsync(EWindow f_Window)
         {

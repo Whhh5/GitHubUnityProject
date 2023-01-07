@@ -64,26 +64,47 @@ namespace B1.Event
             }
             LogEvent();
         }
-        public void UnsubscribeAll(EEvent f_EEvent)
+        public void UnsubscribeAll(EEvent? f_EEvent = null)
         {
-            if (m_DicEvent.TryGetValue(f_EEvent, out var list))
+            if (f_EEvent == null)
             {
-                #region Log
-                string str = $"当前取消全部订阅 event name = {f_EEvent}    count = {list.Count}";
-                str += "\n{";
-                foreach (var item in list)
+                foreach (var item in m_DicEvent)
                 {
-                    str += $"\n\t event layer = {item.layer} ";
+                    #region Log
+                    string str = $"当前取消全部订阅 event name = {f_EEvent}    count = {item.Value.Count}";
+                    str += "\n{";
+                    foreach (var value in item.Value)
+                    {
+                        str += $"\n\t event layer = {value.layer} ";
+                    }
+                    str += "\n}";
+                    LogWarning(str);
+                    #endregion
                 }
-                str += "\n}";
-                LogWarning(str);
-                #endregion
-
-                m_DicEvent.Remove(f_EEvent);
+                m_DicEvent = new();
             }
             else
             {
-                LogError($"当前事件未注册 event name = {f_EEvent}");
+                EEvent key = f_EEvent ?? EEvent.None;
+                if (m_DicEvent.TryGetValue(key, out var list))
+                {
+                    #region Log
+                    string str = $"当前取消全部订阅 event name = {f_EEvent}    count = {list.Count}";
+                    str += "\n{";
+                    foreach (var item in list)
+                    {
+                        str += $"\n\t event layer = {item.layer} ";
+                    }
+                    str += "\n}";
+                    LogWarning(str);
+                    #endregion
+
+                    m_DicEvent.Remove(key);
+                }
+                else
+                {
+                    LogError($"当前事件未注册 event name = {key}");
+                }
             }
             LogEvent();
         }

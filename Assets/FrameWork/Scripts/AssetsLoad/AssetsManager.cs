@@ -16,7 +16,7 @@ namespace B1
             var asset = await Addressables.LoadAssetAsync<GameObject>(f_Path);
             #region Console
             var color = asset != null ? "00FF00FF" : "FF0000FF";
-            Log($"加载资源  result = {asset != null}   <color=#{color}>path = {f_Path} </color>   ");
+            LogWarning($"加载资源  result = {asset != null}   <color=#{color}>path = {f_Path} </color>   ");
             #endregion
             return asset.GetComponent<T>();
         }
@@ -32,22 +32,22 @@ namespace B1
                     obj = GameObject.Instantiate<T>(asset, f_Parent);
                     m_DicAssets.Add(f_Path, (typeof(T), asset, new List<GameObject>()));
                     m_DicAssets[f_Path].objs.Add(obj.gameObject);
-                    Log($"加载预制体实例化成功   Component = {typeof(T)}   path = {f_Path}");
+                    LogWarning($"加载预制体实例化成功   Component = {typeof(T)}   path = {f_Path}");
                 }
                 else
                 {
-                    Log($"资源加载失败  asset path = {f_Path}");
+                    LogWarning($"资源加载失败  asset path = {f_Path}");
                 }
             }
             else if (value.objs.Count > 0 && value.objs[0] != null)
             {
                 if (value.objs[0].TryGetComponent(out obj))
                 {
-                    Log("该资源已经加载过还没有卸载  当前读取的是之前就已经加载过的实例");
+                    LogWarning("该资源已经加载过还没有卸载  当前读取的是之前就已经加载过的实例");
                 }
                 else
                 {
-                    Log($"该对象没有该组件   object name = {value.objs[0].name}   Component = {typeof(T)}");
+                    LogWarning($"该对象没有该组件   object name = {value.objs[0].name}   Component = {typeof(T)}");
                 }
             }
             else
@@ -61,11 +61,11 @@ namespace B1
                     value.objs = new List<GameObject>();
                     obj = GameObject.Instantiate<T>(value.assets as T);
                     value.objs.Add(obj.gameObject);
-                    Log($"实例化预制体成功   Component = {typeof(T)}   path = {f_Path}");
+                    LogWarning($"实例化预制体成功   Component = {typeof(T)}   path = {f_Path}");
                 }
                 else
                 {
-                    Log($"加载类型不匹配  type = {typeof(T)}   value type = {value.type}");
+                    LogWarning($"加载类型不匹配  type = {typeof(T)}   value type = {value.type}");
                 }
             }
             return obj;
@@ -80,11 +80,11 @@ namespace B1
                 {
                     obj = GameObject.Instantiate<T>(value.assets as T, f_Parent);
                     m_DicAssets[f_Path].objs.Add(obj.gameObject);
-                    Log($"实例化预制体成功   Component = {typeof(T)}   path = {f_Path}");
+                    LogWarning($"实例化预制体成功   Component = {typeof(T)}   path = {f_Path}");
                 }
                 else
                 {
-                    Log($"加载类型不匹配  type = {typeof(T)}   value type = {value.type}");
+                    LogWarning($"加载类型不匹配  type = {typeof(T)}   value type = {value.type}");
                 }
             }
             else
@@ -92,14 +92,30 @@ namespace B1
                 obj = await LoadPrefabAsync<T>(f_Path, f_Parent);
                 if (obj != null)
                 {
-                    Log($"加载实例化预制体成功   Component = {typeof(T)}   path = {f_Path}");
+                    LogWarning($"加载实例化预制体成功   Component = {typeof(T)}   path = {f_Path}");
                 }
                 else
                 {
-                    Log($"资源加载失败  asset path = {f_Path}");
+                    LogWarning($"资源加载失败  asset path = {f_Path}");
                 }
             }
             return obj;
+        }
+
+        public async void LoadPrefab<TMono, TUserData>(
+            string f_Path, Transform f_Parent, TUserData f_UserData, Action<TMono, TUserData> f_Callback)
+                where TMono : MonoBehaviour
+        {
+            var obj = await LoadPrefabAsync<TMono>(f_Path, f_Parent);
+            f_Callback.Invoke(obj, f_UserData);
+        }
+
+        public async void LoadPoolPrefab<TMono, TUserData>(
+            string f_Path, Transform f_Parent, TUserData f_UserData, Action<TMono, TUserData> f_Callback)
+                where TMono : MonoBehaviour
+        {
+            var obj = await LoadPoolPrefabAsync<TMono>(f_Path, f_Parent);
+            f_Callback.Invoke(obj, f_UserData);
         }
 
         public async UniTask UnloadAsync(string f_Path)
@@ -122,7 +138,7 @@ namespace B1
                 }
                 await UniTask.WhenAll(tasks);
             }
-            if(m_DicAssets[f_Path].assets != null)
+            if (m_DicAssets[f_Path].assets != null)
             {
                 Addressables.ClearDependencyCacheAsync(m_DicAssets[f_Path].assets);
             }

@@ -18,5 +18,8 @@ namespace B1
         {
             Debug.LogWarning($" 【 {GetType()} 】\n{message}");
         }
+
+        public virtual void Awake() { }
+        public virtual void OnDestroy() { }
     }
 }

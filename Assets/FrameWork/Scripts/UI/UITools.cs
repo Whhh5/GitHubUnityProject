@@ -34,6 +34,7 @@ namespace B1.UI
     }
     public enum EUIWindowPage
     {
+        None,
         UILoginPage,
         UILobbyPage,
         UIMapPage,

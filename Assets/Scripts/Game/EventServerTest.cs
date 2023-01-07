@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class EventServerTest : MonoBehaviour
 {
+    [HideInInspector]
     public string m_Layer;
+    [HideInInspector]
     public EEvent m_Event;
 }

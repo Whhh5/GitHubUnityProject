@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class UILobbyPage : UIWindowPage
 {
+    public string NNmae = "adasdasdadas";
+
     public override async UniTask<List<(EWindow eWindow, EUIRoot root)>> GetWindowNameAsync()
     {
         await UniTask.Delay(0);
