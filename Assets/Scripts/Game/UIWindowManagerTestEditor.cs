@@ -22,7 +22,7 @@ public class UIWindowManagerTestEditor : Editor
     UnityEngine.Object m_UIWindow = null;
     public override async void OnInspectorGUI()
     {
-        m_Page = (EUIWindowPage)EditorGUILayout.EnumFlagsField("Page", m_Page);
+        m_Page = (EUIWindowPage)EditorGUILayout.EnumPopup("Page", m_Page);
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Open Page"))
         {
@@ -46,7 +46,9 @@ public class UIWindowManagerTestEditor : Editor
         }
         if (GUILayout.Button("Close Window") && m_UIWindow != null)
         {
-            (m_UIWindow as UIWindow).OnDestrotAsync();
+            var window = m_UIWindow as UIWindow;
+            window.OnDestroyAsync();
+            GameObject.Destroy(window.gameObject);
         }
         EditorGUILayout.EndHorizontal();
 

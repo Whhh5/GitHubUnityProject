@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using B1.UI;
 using UnityEngine;
 
@@ -12,8 +13,7 @@ namespace B1
         [RuntimeInitializeOnLoadMethod]
         public static async void StartGame()
         {
-            var uiManagerPath = $"{PathManager.UIWindow}UGUISystem.prefab";
-            await AssetsManager.Instance.LoadPrefabAsync<UGUISystem>(uiManagerPath, null);
+            await AssetsManager.Instance.LoadPrefabAsync<UGUISystem>(EPrefab.UGUISystem, null);
             await UIWindowManager.Instance.OpenPageAsync<UILobbyPage>();
 
 

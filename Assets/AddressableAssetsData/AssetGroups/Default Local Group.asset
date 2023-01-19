@@ -18,25 +18,35 @@ MonoBehaviour:
   m_GUID: 09a3cb1ea192e401497f6d08514b33ef
   m_SerializeEntries:
   - m_GUID: fc16562513c804ba3bd4385f8ef93285
-    m_Address: Assets/ARSBPath/Prefabs/UI/UGUISystem.prefab
+    m_Address: UGUISystem
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Prefab
   - m_GUID: b1455a6954cb84ea3877dec22c523d28
-    m_Address: Assets/ARSBPath/Prefabs/UI/UILogin.prefab
+    m_Address: UILogin
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Prefab
   - m_GUID: 7178d20c995c044ca93a72eea5428cff
-    m_Address: Assets/ARSBPath/Prefabs/UI/UILobby.prefab
+    m_Address: UILobby
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Prefab
   - m_GUID: 2e31a7835eeb04cffabdb3d0c1c01d5e
-    m_Address: Assets/ARSBPath/Prefabs/UI/UILobbyItemInfo.prefab
+    m_Address: UILobbyItemInfo
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Prefab
   - m_GUID: 0cc8aed9de7ae4e30825da1e7298f651
-    m_Address: Assets/ARSBPath/Prefabs/UI/UILobbyNavigationBar.prefab
+    m_Address: UILobbyNavigationBar
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Prefab
+  - m_GUID: d01f990b378e348448fb0356089e5a85
+    m_Address: UINavigationBar
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Prefab
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 056db3dee3486459a9eb7c3820ef1dcd, type: 2}
   m_SchemaSet:

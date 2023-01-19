@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
+using B1.UI;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -10,33 +12,39 @@ namespace B1
 {
     public class AssetsManager : Singleton<AssetsManager>
     {
-        Dictionary<string, (Type type, object assets, List<GameObject> objs)> m_DicAssets = new();
-        public async UniTask<T> LoadAsync<T>(string f_Path) where T : class
+        private string GetAssetKey<TKey>(TKey f_Key, EAssetLable f_Lable) where TKey : struct => $"{f_Key}.{f_Lable}";
+
+        Dictionary<string, (Type type, bool isIns, object assets, List<GameObject> objs)> m_DicAssets = new();
+        private async UniTask<T> LoadAsync<T>(string f_Key, string f_Lable) where T : class
         {
-            var asset = await Addressables.LoadAssetAsync<GameObject>(f_Path);
+            List<string> key = new List<string> { f_Key };
+            var asset = await Addressables.LoadAssetAsync<GameObject>(f_Key);
             #region Console
             var color = asset != null ? "00FF00FF" : "FF0000FF";
-            LogWarning($"加载资源  result = {asset != null}   <color=#{color}>path = {f_Path} </color>   ");
+            LogWarning($"加载资源  result = {asset != null}   <color=#{color}>path = {f_Key} </color>   ");
             #endregion
             return asset.GetComponent<T>();
         }
 
-        public async UniTask<T> LoadPrefabAsync<T>(string f_Path, Transform f_Parent) where T : MonoBehaviour
+        public async UniTask<(bool result, T obj)> LoadPrefabAsync<T>(EPrefab f_EPrefab, Transform f_Parent) where T : MonoBehaviour
         {
             T obj = default(T);
-            if (!m_DicAssets.TryGetValue(f_Path, out var value))
+            bool result = false;
+            var dicKey = GetAssetKey(f_EPrefab, EAssetLable.Prefab);
+            if (!m_DicAssets.TryGetValue(dicKey, out var value))
             {
-                var asset = await LoadAsync<T>(f_Path);
+                var asset = await LoadAsync<T>(f_EPrefab.ToString(), EAssetLable.Prefab.ToString());
                 if (asset != null)
                 {
+                    result = true;
                     obj = GameObject.Instantiate<T>(asset, f_Parent);
-                    m_DicAssets.Add(f_Path, (typeof(T), asset, new List<GameObject>()));
-                    m_DicAssets[f_Path].objs.Add(obj.gameObject);
-                    LogWarning($"加载预制体实例化成功   Component = {typeof(T)}   path = {f_Path}");
+                    m_DicAssets.Add(dicKey, (typeof(T), true, asset, new()));
+                    m_DicAssets[dicKey].objs.Add(obj.gameObject);
+                    LogWarning($"加载预制体实例化成功   Component = {typeof(T)}   path = {dicKey}");
                 }
                 else
                 {
-                    LogWarning($"资源加载失败  asset path = {f_Path}");
+                    LogWarning($"资源加载失败  asset path = {dicKey}");
                 }
             }
             else if (value.objs.Count > 0 && value.objs[0] != null)
@@ -54,33 +62,31 @@ namespace B1
             {
                 if (value.assets as T != null)
                 {
-                    foreach (var item in value.objs)
-                    {
-                        if (item != null && item.gameObject != null) GameObject.Destroy(item.gameObject);
-                    }
                     value.objs = new List<GameObject>();
+                    result = true;
                     obj = GameObject.Instantiate<T>(value.assets as T);
                     value.objs.Add(obj.gameObject);
-                    LogWarning($"实例化预制体成功   Component = {typeof(T)}   path = {f_Path}");
+                    LogWarning($"实例化预制体成功   Component = {typeof(T)}   path = {dicKey}");
                 }
                 else
                 {
                     LogWarning($"加载类型不匹配  type = {typeof(T)}   value type = {value.type}");
                 }
             }
-            return obj;
+            return (result, obj);
         }
 
-        public async UniTask<T> LoadPoolPrefabAsync<T>(string f_Path, Transform f_Parent) where T : MonoBehaviour
+        public async UniTask<T> LoadPoolPrefabAsync<T>(EPrefab f_EPrefab, Transform f_Parent) where T : MonoBehaviour
         {
             T obj = default(T);
-            if (m_DicAssets.TryGetValue(f_Path, out var value))
+            var dicKey = GetAssetKey(f_EPrefab, EAssetLable.Prefab);
+            if (m_DicAssets.TryGetValue(dicKey, out var value))
             {
                 if (value.assets as T != null)
                 {
                     obj = GameObject.Instantiate<T>(value.assets as T, f_Parent);
-                    m_DicAssets[f_Path].objs.Add(obj.gameObject);
-                    LogWarning($"实例化预制体成功   Component = {typeof(T)}   path = {f_Path}");
+                    m_DicAssets[dicKey].objs.Add(obj.gameObject);
+                    LogWarning($"实例化预制体成功   Component = {typeof(T)}   path = {dicKey}");
                 }
                 else
                 {
@@ -89,73 +95,129 @@ namespace B1
             }
             else
             {
-                obj = await LoadPrefabAsync<T>(f_Path, f_Parent);
-                if (obj != null)
+                var result = await LoadPrefabAsync<T>(f_EPrefab, f_Parent);
+                if (result.obj != null)
                 {
-                    LogWarning($"加载实例化预制体成功   Component = {typeof(T)}   path = {f_Path}");
+                    obj = result.obj;
+                    LogWarning($"加载实例化预制体成功   Component = {typeof(T)}   path = {dicKey}");
                 }
                 else
                 {
-                    LogWarning($"资源加载失败  asset path = {f_Path}");
+                    LogWarning($"资源加载失败  asset path = {dicKey}");
                 }
             }
             return obj;
         }
 
         public async void LoadPrefab<TMono, TUserData>(
-            string f_Path, Transform f_Parent, TUserData f_UserData, Action<TMono, TUserData> f_Callback)
+            EPrefab f_EPrefab, Transform f_Parent, TUserData f_UserData, Action<TMono, TUserData> f_Callback)
                 where TMono : MonoBehaviour
         {
-            var obj = await LoadPrefabAsync<TMono>(f_Path, f_Parent);
-            f_Callback.Invoke(obj, f_UserData);
+            var result = await LoadPrefabAsync<TMono>(f_EPrefab, f_Parent);
+            f_Callback.Invoke(result.obj, f_UserData);
         }
 
         public async void LoadPoolPrefab<TMono, TUserData>(
-            string f_Path, Transform f_Parent, TUserData f_UserData, Action<TMono, TUserData> f_Callback)
+            EPrefab f_EPrefab, Transform f_Parent, TUserData f_UserData, Action<TMono, TUserData> f_Callback)
                 where TMono : MonoBehaviour
         {
-            var obj = await LoadPoolPrefabAsync<TMono>(f_Path, f_Parent);
+            var obj = await LoadPoolPrefabAsync<TMono>(f_EPrefab, f_Parent);
             f_Callback.Invoke(obj, f_UserData);
         }
 
-        public async UniTask UnloadAsync(string f_Path)
+
+        /// <summary>
+        /// 卸载一个资源或者多个资源  <see langword="if ( f_Obj == null )" />     并且资源存在 则卸载所有使用该资源的对象
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="f_Key"></param>
+        /// <param name="f_Obj"></param>
+        /// <returns></returns>
+        public async UniTask UnloadAsync(string f_Key, GameObject f_Obj)
         {
-            if (m_DicAssets[f_Path].objs != null)
+            if (!m_DicAssets.TryGetValue(f_Key, out var value))
             {
-                UniTask[] tasks = new UniTask[m_DicAssets[f_Path].objs.Count];
-                uint index = 0;
-                foreach (var item in m_DicAssets[f_Path].objs)
+                LogError($"正在卸载一个没有加载的资源      dicKey = {f_Key}     f_Obj = {f_Obj}");
+                return;
+            }
+
+            // 设置是否卸载实例化的对象
+            var baseType = Type.GetType("GameObject");
+
+            // 判断卸载资源类型   单个 or 多个
+            if (f_Obj == null)
+            {
+                // 判断当前资源是否是实例化对象
+                if (value.isIns)
                 {
-                    var asset = item;
-                    tasks[index++] = UniTask.Create(async () =>
+                    List<UniTask> tasks = new();
+                    foreach (var item in value.objs)
                     {
-                        await UniTask.Delay(0);
-                        if (asset.gameObject != null)
+                        if (item != null)
                         {
-                            GameObject.Destroy(asset.gameObject);
+                            var obj = item;
+                            tasks.Add(UniTask.Create(async () =>
+                            {
+                                var coms = obj.GetComponents<IOnDestroyAsync>();
+                                foreach (var com in coms)
+                                {
+                                    await com.OnDestroyAsync();
+                                }
+                                GameObject.Destroy(obj);
+                            }));
                         }
-                    });
+                    }
+                    await UniTask.WhenAll(tasks);
                 }
-                await UniTask.WhenAll(tasks);
+                value.objs = new();
             }
-            if (m_DicAssets[f_Path].assets != null)
+            // 判断 该对象是否引用了该资源
+            else if (value.objs.Contains(f_Obj))
             {
-                Addressables.ClearDependencyCacheAsync(m_DicAssets[f_Path].assets);
+                value.objs.Remove(f_Obj);
+                // 判断当前资源是否是实例化对象
+                if (value.isIns)
+                {
+                    var coms = f_Obj.GetComponents<IOnDestroyAsync>();
+                    foreach (var com in coms)
+                    {
+                        await com.OnDestroyAsync();
+                    }
+                    GameObject.Destroy(f_Obj);
+                }
             }
-            m_DicAssets.Remove(f_Path);
+            else
+            {
+                LogError($"该对象没有引用 当前资源    f_Obj = {f_Obj}     dicKey = {f_Key}  ");
+            }
+
+            // 判断是否从内存中移除资源
+            if (value.objs.Count <= 0)
+            {
+                Addressables.ClearDependencyCacheAsync(value.assets);
+                m_DicAssets.Remove(f_Key);
+            }
         }
-        public async UniTask UnLoadAllAsync()
+        public async UniTask UnloadAsync<TKey>(TKey f_Key, EAssetLable f_Lable, GameObject f_Obj)
+            where TKey : struct
+        {
+            var dicKey = GetAssetKey(f_Key, f_Lable);
+            await UnloadAsync(dicKey, f_Obj);
+        }
+
+        public async UniTask UnloadAllAsync()
         {
             UniTask[] tasks = new UniTask[m_DicAssets.Count];
-            uint index = 0;
+            int index = 0;
             foreach (var item in m_DicAssets)
             {
-                var asset = item;
                 tasks[index++] = UniTask.Create(async () =>
-                {
-                    await UnloadAsync(asset.Key);
-                });
+                    {
+                        await UnloadAsync(item.Key, null);
+                    });
+                
             }
+            m_DicAssets = new();
             await UniTask.WhenAll(tasks);
         }
     }

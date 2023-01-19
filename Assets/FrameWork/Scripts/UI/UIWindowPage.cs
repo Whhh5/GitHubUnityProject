@@ -9,9 +9,9 @@ namespace B1.UI
 {
     public abstract class UIWindowPage : Base, IUIWindowPage
     {
-        public abstract UniTask<List<(EWindow eWindow, EUIRoot root)>> GetWindowNameAsync();
+        public abstract UniTask<List<(EPrefab eWindow, EUIRoot root)>> GetWindowNameAsync();
 
-        private Dictionary<EWindow, UIWindow> m_DicWindow = new();
+        private Dictionary<EPrefab, UIWindow> m_DicWindow = new();
         public async UniTask InitAsync()
         {
             var fieldInfo = typeof(EUIWindowPage).GetField($"{GetType()}");
@@ -35,11 +35,10 @@ namespace B1.UI
                             if (window != null)
                             {
                                 window.gameObject.SetActive(false);
-                                window.m_CurPage = this;
                                 window.m_CurentPageType = pageType;
-                                await window.AwakeAsync();
+                                window.m_CurPage = this;
+
                                 m_DicWindow.Add(windowInfo.eWindow, window);
-                                EventManager.Instance.FireEvent(EEvent.UI_WINDOW_LOAD_FINISH, window, windowInfo.ToString());
                             }
                             else
                             {
@@ -55,7 +54,7 @@ namespace B1.UI
                 Log("UIPage 打开失败  未获取到当前 page 的窗口   请重写函数并返回 GetWindowNameAsync()");
             }
         }
-        public async UniTask ShowAsync(EWindow f_Window)
+        public async UniTask ShowAsync(EPrefab f_Window)
         {
             try
             {
@@ -68,7 +67,7 @@ namespace B1.UI
                 LogError($"窗口不存在当前 page 中     f_Window = {f_Window}");
             }
         }
-        public async UniTask HideAsync(EWindow f_Window)
+        public async UniTask HideAsync(EPrefab f_Window)
         {
             var window = m_DicWindow[f_Window];
             await window.HideAsync();
@@ -83,11 +82,12 @@ namespace B1.UI
                 var window = item;
                 tasks[index++] = UniTask.Create(async () =>
                 {
-                    await UIWindowManager.Instance.UnloadWindowAsync(item.Key);
+                    await UIWindowManager.Instance.UnloadWindowAsync(window.Key, window.Value.gameObject);
                     EventManager.Instance.FireEvent(EEvent.UI_WINDOW_UNLOAD_FINISH, window.Key, window.Key.ToString());
                 });
             }
             await UniTask.WhenAll(tasks);
+
         }
         public async UniTask HideAllAsync()
         {
@@ -105,7 +105,7 @@ namespace B1.UI
         }
 
 
-        public async UniTask<UIWindow> GetWindowAsync(EWindow f_EWindow)
+        public async UniTask<UIWindow> GetWindowAsync(EPrefab f_EWindow)
         {
             await UniTask.Delay(0);
             if (!m_DicWindow.TryGetValue(f_EWindow, out var window))
@@ -114,5 +114,11 @@ namespace B1.UI
             }
             return window;
         }
+
+        //public async UniTask<UIWindow> GetWindowAsync(EPrefab f_EPrefab)
+        //{
+
+        //}
+
     }
 }

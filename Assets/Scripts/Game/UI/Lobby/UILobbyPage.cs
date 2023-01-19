@@ -8,14 +8,14 @@ public class UILobbyPage : UIWindowPage
 {
     public string NNmae = "adasdasdadas";
 
-    public override async UniTask<List<(EWindow eWindow, EUIRoot root)>> GetWindowNameAsync()
+    public override async UniTask<List<(EPrefab eWindow, EUIRoot root)>> GetWindowNameAsync()
     {
         await UniTask.Delay(0);
-        var windowList = new List<(EWindow eWindow, EUIRoot root)>()
+        var windowList = new List<(EPrefab eWindow, EUIRoot root)>()
         {
-            (EWindow.UILobby, EUIRoot.App1),
-            (EWindow.UILobbyItemInfo, EUIRoot.App1),
-            (EWindow.UILobbyNavigationBar, EUIRoot.App1),
+            (EPrefab.UILobby, EUIRoot.App1),
+            (EPrefab.UILobbyItemInfo, EUIRoot.App1),
+            (EPrefab.UILobbyNavigationBar, EUIRoot.App1),
         };
         return windowList;
     }

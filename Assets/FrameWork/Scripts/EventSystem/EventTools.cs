@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace B1.Event
 {
-    public enum EEvent
+    public enum EEvent : int
     {
         None,
         SCENE_LOAD_START,

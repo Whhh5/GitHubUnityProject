@@ -16,7 +16,7 @@ public class ListStack<T> : Base
 
     }
     private List<T> m_List = new();
-    private uint m_Pointer = 0;
+    public uint m_Pointer { get; private set; } = 0;
     private uint m_AddCount = 0;
 
 
@@ -88,6 +88,7 @@ public class ListStack<TKey, TValue> : Base
     }
     private Dictionary<TKey, TValue> m_Dic = null;
     private ListStack<TKey> m_KeyStack = null;
+    public uint Count => m_KeyStack.m_Pointer;
 
 
     public bool TryPop(out TValue f_Value)

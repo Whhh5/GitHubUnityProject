@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 namespace B1.UI
 {
     [RequireComponent(typeof(CanvasGroup))]
-    public abstract class UIWindow : MonoBase
+    public abstract class UIWindow : MonoBase, IOnDestroyAsync
     {
         enum EDGType
         {
@@ -25,9 +25,12 @@ namespace B1.UI
         CanvasGroup m_CanvasGroup => GetComponent<CanvasGroup>();
         RectTransform m_Rect => GetComponent<RectTransform>();
 
-
+        [HideInInspector]
         public EUIWindowPage m_CurentPageType = EUIWindowPage.None;
         public UIWindowPage m_CurPage = null;
+
+        [HideInInspector]
+        public EUIRoot m_AppRoot = EUIRoot.None;
 
         public async UniTask<T> GetPage<T>() where T : UIWindowPage
         {
@@ -86,10 +89,9 @@ namespace B1.UI
 
         }
 
-        public virtual async UniTask OnDestrotAsync()
+        public async UniTask OnDestroyAsync()
         {
             DOTween.Kill(EDGType.ShowUIWindow);
-            GameObject.Destroy(gameObject);
         }
     }
 }

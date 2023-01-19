@@ -5,8 +5,9 @@ using UnityEngine;
 
 namespace B1.UI
 {
-    public enum EUIRoot
+    public enum EUIRoot : ushort
     {
+        None,
         Scene,
         App1,
         App2,
@@ -14,7 +15,7 @@ namespace B1.UI
         System,
         EnumCount,
     }
-    public enum EWindow
+    public enum EPrefab : ulong
     {
         #region UILobby
         UILogin,
@@ -30,9 +31,14 @@ namespace B1.UI
         UIMap,
         #endregion
 
+        #region UISystem
+        UGUISystem,
+        UINavigationBar,
+        #endregion
+
         EnumCount,
     }
-    public enum EUIWindowPage
+    public enum EUIWindowPage : int
     {
         None,
         UILoginPage,

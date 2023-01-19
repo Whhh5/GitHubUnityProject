@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 738880677984472286}
   - component: {fileID: 6197949337089655516}
   - component: {fileID: 7924686172864816594}
+  - component: {fileID: 8368004366744501582}
   m_Layer: 5
   m_Name: UINavigationBar
   m_TagString: Untagged
@@ -59,8 +60,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7310ae6264829740a247051dca59e56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_BtnRetreat: {fileID: 0}
-  m_BtnAdvace: {fileID: 0}
+  m_CurentPageType: 0
+  m_BtnRetreat: {fileID: 8321398976709062364}
+  m_BtnAdvace: {fileID: 5521827509104315509}
+--- !u!225 &8368004366744501582
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 270336011616631531}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2952389132220396870
 GameObject:
   m_ObjectHideFlags: 0
