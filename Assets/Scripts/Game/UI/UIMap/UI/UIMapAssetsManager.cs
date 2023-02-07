@@ -42,8 +42,8 @@ public class UIMapAssetsManager : MonoBehaviour
     }
     #endregion
 
-    Dictionary<string, (Sprite sprite, int instanceID, List<string> list)> m_SpriteAssets = new();
-    Dictionary<string, GameObject> m_GameobjecAssets = new();
+    public Dictionary<string, (Sprite sprite, int instanceID, List<string> list)> m_SpriteAssets = new();
+    public Dictionary<string, GameObject> m_GameobjecAssets = new();
 
 
 
@@ -116,6 +116,11 @@ public class UIMapAssetsManager : MonoBehaviour
             if (value.list.Contains(layer))
             {
                 value.list.Remove(layer);
+                if (value.list.Count <= 0)
+                {
+                    UnLoadAsync(value.sprite);
+                    m_SpriteAssets.Remove(assetPath);
+                }
                 Log($"成功 移除资源引用  layer = {layer}, assetPath = {assetPath}");
                 ConsoleAssetDictionary();
             }
@@ -159,7 +164,7 @@ public class UIMapAssetsManager : MonoBehaviour
     {
         if (m_GameobjecAssets.TryGetValue(f_AssetPath, out var obj) && obj != null)
         {
-            UnLoadAsync(obj);
+            UnLoadAsync<GameObject>(obj.gameObject);
             m_GameobjecAssets.Remove(f_AssetPath);
         }
         else

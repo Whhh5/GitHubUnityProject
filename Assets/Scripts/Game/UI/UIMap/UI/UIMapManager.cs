@@ -225,6 +225,14 @@ public class UIMapManager : MonoBehaviour
     /// </summary>
     [SerializeField]
     private float m_TouchDistance = 0.0f;
+    [SerializeField]
+    private Vector2 m_MousePosition => false ? (m_MapScroll.m_EventData?.position ?? Vector2.zero) : Input.mousePosition;
+
+    private Dictionary<ushort, Action> m_MapAction = new Dictionary<ushort, Action>
+    {
+        //(1, ()=>{ }),
+
+    };
 
     /// <summary>
     /// 其他脚本
@@ -247,7 +255,7 @@ public class UIMapManager : MonoBehaviour
                 }
                 else
                 {
-                    UIMapFlagPointManager.Instance.ShowFlagPointTypeWindow(GetUIMapPosByViewPos(Input.mousePosition));
+                    UIMapFlagPointManager.Instance.ShowFlagPointTypeWindow(GetUIMapPosByViewPos(m_MousePosition));
                 }
             });
 
@@ -269,17 +277,25 @@ public class UIMapManager : MonoBehaviour
 
     }
 
+    void OnScrollValueChangeClick(Vector2 f_Value)
+    {
+        UpdateViewInfo();
+    } 
     private void OnEnable()
     {
         m_LiftCycle.UpdateFrameRate00 += OnScrollWheel;
         m_LiftCycle.UpdateFrameRate00 += OnTouchClick;
-        m_LiftCycle.UpdateFrameRate05 += UpdateViewInfo;
+        //m_LiftCycle.UpdateFrameRate05 += UpdateViewInfo;
+
+        m_MapScroll.onValueChanged.AddListener(OnScrollValueChangeClick);
     }
     private void OnDisable()
     {
         m_LiftCycle.UpdateFrameRate00 -= OnScrollWheel;
         m_LiftCycle.UpdateFrameRate00 -= OnTouchClick;
-        m_LiftCycle.UpdateFrameRate05 -= UpdateViewInfo;
+        //m_LiftCycle.UpdateFrameRate05 -= UpdateViewInfo;
+
+        m_MapScroll.onValueChanged.RemoveListener(OnScrollValueChangeClick);
     }
 
     private void Update()
@@ -500,7 +516,6 @@ public class UIMapManager : MonoBehaviour
                     break;
             }
         }
-        UIMapAssetsManager.Instance.ReleaseUnuseSpritedAssets();
     }
     #endregion
 
@@ -636,7 +651,7 @@ public class UIMapManager : MonoBehaviour
         var viewPos = viewWorldPos * m_MapCurScale.value;
 
 
-        return (isViewShow, viewWorldPos + curMapCentrePos, viewWorldPos, viewPos, canvasPos);
+        return (isViewShow, viewWorldPos + curMapCentrePos, viewWorldPos, viewPos , canvasPos);
     }
     /// <summary>
     /// 获取一个有效的地图点
@@ -822,11 +837,11 @@ public class UIMapManager : MonoBehaviour
     /// <param name="state"></param>
     public void ChangeUIMapState(EUIMapStatus? state = null)
     {
-        m_MapState = state ?? (EUIMapStatus)Mathf.Abs((int)m_MapState - 1);
+        state = m_MapState = state ?? (EUIMapStatus)Mathf.Abs((int)m_MapState - 1);
         DOTween.Kill(EUIMapDGIDType.SetUIMapState);
 
         #region 需要配置的数据 setting data
-        // 地图大小
+        // 小地图大小
         var endValue = 0.5f;
         #endregion
 
@@ -864,7 +879,6 @@ public class UIMapManager : MonoBehaviour
             default:
                 break;
         }
-
         // 清空地图数据
         ChangeMapStatusClearMapData(state: (EUIMapStatus)MathF.Abs((int)state - 1));
 
@@ -888,20 +902,6 @@ public class UIMapManager : MonoBehaviour
             }, mapDegeMask, moveTime)
                 .SetId(EUIMapDGIDType.SetUIMapState);
 
-        // 地图缩放
-        if (true)
-        {
-            m_MapSlider.value = miniMapScale;
-        }
-        else
-        {
-            DOTween.To(() => m_MapSlider.value, (value) =>
-            {
-                m_MapSlider.value = value;
-            }, miniMapScale, moveTime)
-                    .SetId(EUIMapDGIDType.SetUIMapState);
-        }
-
         // 隐藏进度条
         var canvasGroup = m_MapSlider.GetComponent<CanvasGroup>();
         canvasGroup.blocksRaycasts = canvasGroup.interactable = isShowSlider;
@@ -921,7 +921,25 @@ public class UIMapManager : MonoBehaviour
                     canvasGroup.blocksRaycasts = canvasGroup.interactable = true;
                 });
 
+        // 不需要动画的
+        DOTween.To(() => 0.0f, (value) => { }, 1.0f, moveTime)
+            .SetId(EUIMapDGIDType.SetUIMapState)
+            .OnStart(() =>
+                {
+
+                })
+            .OnComplete(() =>
+                {
+                    // 释放资源
+                    UIMapAssetsManager.Instance.ReleaseUnuseSpritedAssets();
+                    UIMapPoolManager.Instance.ReleasePoolAssets();
+                    // 地图缩放
+                    m_MapSlider.value = miniMapScale;
+                });
+
+        #region 外部函数调用
         UIMapFlagPointManager.Instance.UpdateFlagStateByUIMapSatus();
+        #endregion
     }
 
     private void SetScaleRootPivotTo(Vector2 f_ViewPos)
@@ -942,7 +960,7 @@ public class UIMapManager : MonoBehaviour
     #region 按钮事件 button
     private void OnMapScaleChangeClick(float f_Value)
     {
-        Vector2 guiPos = Input.mousePosition;
+        Vector2 guiPos = m_MousePosition;
         switch (m_ScaleModule)
         {
             case EScaleModule.GUICentre:
@@ -988,12 +1006,13 @@ public class UIMapManager : MonoBehaviour
         DOTween.Kill(EUIMapDGIDType.ChangMapScaleTo);
 
         var pivot = f_OnGUIPos / m_CustomViewWH;
-        var curMOusePos = Input.mousePosition;
+        var curMOusePos = m_MousePosition;
         var moveTime = Mathf.Min(Mathf.Max(Mathf.Abs(m_MapCurScale.value - f_ToValue), 0.5f), 1.0f);
+        //var curMapContre = GetCurMapCentrePos();
         DOTween.To(() => m_MapCurScale.value, (value) =>
         {
-            var curMapContre = GetCurMapCentrePos();
             m_MapScaleRect.localScale = Vector3.one * value;
+            //SetCurMapCentrePos(curMapContre);
             UIMapFlagPointManager.Instance.UpdateFlagPointScale(1 / value);
 
         }, f_ToValue, moveTime)
@@ -1006,16 +1025,24 @@ public class UIMapManager : MonoBehaviour
     public void OnTouchClick()
     {
         m_IsHaveTouchDown = Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began || Input.GetMouseButtonDown(0);
-        if (Input.touchCount < 2 || m_MapState != EUIMapStatus.BigMap) return;
+        if (Input.touchCount < 2 || m_MapState != EUIMapStatus.BigMap)
+        {
+            m_MapScroll.horizontal = m_MapScroll.vertical = true;
+            return;
+        }
+        else
+        {
+            m_MapScroll.horizontal = m_MapScroll.vertical = false;
+        }
         var dis = Vector2.Distance(Input.GetTouch(0).deltaPosition, Input.GetTouch(1).deltaPosition);
 
         switch (Input.GetTouch(1).phase)
         {
             case TouchPhase.Began:
-                m_TouchDistance = dis;
                 break;
             case TouchPhase.Moved:
                 #region 手指移动
+                if (m_TouchDistance <= 0.01f) m_TouchDistance = dis;
 
                 var inrcementDis = dis - m_TouchDistance;
                 inrcementDis /= 100;
@@ -1027,11 +1054,43 @@ public class UIMapManager : MonoBehaviour
             case TouchPhase.Stationary:
                 break;
             case TouchPhase.Ended:
+                m_TouchDistance = 0.0f;
                 break;
             case TouchPhase.Canceled:
                 break;
             default:
                 break;
+        }
+    }
+
+    float m_BegionDis;
+
+    public void OnTouchClickTest()
+    {
+        return;
+        if (Input.GetMouseButtonDown(0))
+        {
+            m_BegionDis = 0.0f;
+            m_MapScroll.horizontal = m_MapScroll.vertical = false;
+        }
+
+        Vector2 mouse1 = Vector2.zero;
+        Vector2 mouse2 = Input.mousePosition;
+
+        if (Input.GetMouseButton(0))
+        {
+            var dis = Vector2.Distance(mouse2, mouse1);
+            if (m_BegionDis <= 0.01f) m_BegionDis = dis;
+
+            var inrcementDis = dis - m_BegionDis;
+            inrcementDis /= 100;
+            OnMouseScrollWheelClick(inrcementDis);
+            m_BegionDis = dis;
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+            m_BegionDis = 0.0f;
+            m_MapScroll.horizontal = m_MapScroll.vertical = true;
         }
     }
 
@@ -1076,11 +1135,13 @@ public class UIMapManager : MonoBehaviour
 
 
         #region yes
-        var mousPosToMapPos = GetUIMapPosByViewPos(Input.mousePosition);
+        var mousPosToMapPos = GetUIMapPosByViewPos(m_MousePosition);
         m_Target2.anchoredPosition = mousPosToMapPos;
         #endregion
 
-        //SetScaleRootPivotTo(Input.mousePosition);
+        //SetScaleRootPivotTo(m_MousePosition);
+
+        OnTouchClickTest();
     }
 
 

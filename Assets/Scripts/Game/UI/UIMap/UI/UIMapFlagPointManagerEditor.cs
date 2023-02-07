@@ -80,54 +80,6 @@ public class UIMapFlagPointManagerWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
 
 
-
-
-
-
-        //EditorGUILayout.BeginVertical();
-        //GUILayout.Label("m_FlagType_Instance");
-        //EditorGUILayout.BeginHorizontal();
-        //EditorGUILayout.BeginVertical();
-        //foreach (var item in m_Target.m_FlagType_Instance)
-        //{
-        //    EditorGUILayout.BeginHorizontal();
-
-        //    EditorGUILayout.LabelField($"key = {item.Key}, count = ({(int)item.Value.showMap}){item.Value.showMap}, ", GUILayout.Width(300));
-
-        //    int index = 0;
-        //    EditorGUILayout.BeginVertical();
-        //    foreach (var item2 in item.Value.list)
-        //    {
-        //        EditorGUILayout.BeginHorizontal();
-        //        EditorGUILayout.LabelField($"[ {index++} ] = ", GUILayout.Width(50));
-        //        EditorGUILayout.ObjectField(item2, typeof(UIMapFlagPoint));
-        //        EditorGUILayout.EndHorizontal();
-        //    }
-        //    EditorGUILayout.EndVertical();
-
-
-        //    EditorGUILayout.EndHorizontal();
-
-        //    GUILayout.Space(20);
-        //}
-        //EditorGUILayout.EndVertical();
-
-        //EditorGUILayout.BeginVertical();
-        ////foreach (var item in m_Target.m_FlagType_Instance)
-        ////{
-        ////    EditorGUILayout.EnumPopup(item.Value.showMap);
-        ////}
-        //EditorGUILayout.EndVertical();
-        //EditorGUILayout.EndHorizontal();
-        //EditorGUILayout.EndVertical();
-
-
-
-        //EditorGUILayout.Space(50);
-
-
-
-
         EditorGUILayout.BeginVertical();
         GUILayout.Label("m_ListTrace");
         EditorGUILayout.BeginHorizontal();
@@ -205,11 +157,6 @@ public class UIMapFlagPointManagerWindow : EditorWindow
 
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.EndVertical();
-
-
-
-
-
 
 
 

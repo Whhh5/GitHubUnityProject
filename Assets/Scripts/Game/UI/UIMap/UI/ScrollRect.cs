@@ -4,6 +4,58 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+
+public class ScrollRect : ScrollRectBase
+{
+    [SerializeField]
+    private RectTransform m_ScaleObject = null;
+    private Vector2 m_ContentPos = Vector2.zero;
+    public override void SetContentAnchoredPosition(Vector2 position)
+    {
+        Vector3 scale = m_ScaleObject?.localScale ?? Vector3.one;
+        var maxMoveDis = (Vector2)m_ViewBounds.size - m_Content.sizeDelta;
+        position.x = Mathf.Clamp(position.x, maxMoveDis.x + 
+            m_ScaleObject.rect.x / 2 * (scale.x - 1), -m_ScaleObject.rect.x / 2 * (scale.x - 1));
+        position.y = Mathf.Clamp(position.y, maxMoveDis.y + 
+            m_ScaleObject.rect.y / 2 * (scale.x - 1), -m_ScaleObject.rect.y / 2 * (scale.y - 1));
+        if (!m_Horizontal)
+            position.x = m_Content.anchoredPosition.x;
+        if (!m_Vertical)
+            position.y = m_Content.anchoredPosition.y;
+
+        if (position != m_Content.anchoredPosition)
+        {
+            m_ContentPos = position - m_Content.anchoredPosition;
+        }
+    }
+    protected override void LateUpdate()
+    {
+        if (m_Content == null) return;
+        m_Content.anchoredPosition += m_ContentPos;
+        m_ContentPos = Vector2.zero;
+
+        base.LateUpdate();
+    }
+
+    public PointerEventData m_EventData = null;
+    public override void OnDrag(PointerEventData eventData)
+    {
+        //m_EventData = eventData;
+        base.OnDrag(eventData);
+    }
+    public override void OnBeginDrag(PointerEventData eventData)
+    {
+        m_EventData = eventData;
+        base.OnBeginDrag(eventData);
+    }
+    public override void OnEndDrag(PointerEventData eventData)
+    {
+        //m_EventData = null;
+        base.OnEndDrag(eventData);
+    }
+}
+
+
 [AddComponentMenu("UI/Scroll Rect", 37)]
 [SelectionBase]
 [ExecuteAlways]
@@ -15,7 +67,7 @@ using UnityEngine.UI;
 /// <remarks>
 /// ScrollRect will not do any clipping on its own. Combined with a Mask component, it can be turned into a scroll view.
 /// </remarks>
-public class ScrollRect : UIBehaviour, IInitializePotentialDragHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IScrollHandler, ICanvasElement, ILayoutElement, ILayoutGroup
+public class ScrollRectBase : UIBehaviour, IInitializePotentialDragHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IScrollHandler, ICanvasElement, ILayoutElement, ILayoutGroup
 {
     /// <summary>
     /// A setting for which behavior to use when content moves beyond the confines of its container.
@@ -101,7 +153,7 @@ public class ScrollRect : UIBehaviour, IInitializePotentialDragHandler, IBeginDr
     public class ScrollRectEvent : UnityEvent<Vector2> { }
 
     [SerializeField]
-    private RectTransform m_Content;
+    protected RectTransform m_Content;
 
     /// <summary>
     /// The content that can be scrolled. It should be a child of the GameObject with ScrollRect on it.
@@ -131,7 +183,7 @@ public class ScrollRect : UIBehaviour, IInitializePotentialDragHandler, IBeginDr
     public RectTransform content { get { return m_Content; } set { m_Content = value; } }
 
     [SerializeField]
-    private bool m_Horizontal = true;
+    protected bool m_Horizontal = true;
 
     /// <summary>
     /// Should horizontal scrolling be enabled?
@@ -162,7 +214,7 @@ public class ScrollRect : UIBehaviour, IInitializePotentialDragHandler, IBeginDr
     public bool horizontal { get { return m_Horizontal; } set { m_Horizontal = value; } }
 
     [SerializeField]
-    private bool m_Vertical = true;
+    protected bool m_Vertical = true;
 
     /// <summary>
     /// Should vertical scrolling be enabled?
@@ -475,7 +527,7 @@ public class ScrollRect : UIBehaviour, IInitializePotentialDragHandler, IBeginDr
     }
 
     protected Bounds m_ContentBounds;
-    private Bounds m_ViewBounds;
+    protected Bounds m_ViewBounds;
 
     private Vector2 m_Velocity;
 
@@ -520,7 +572,7 @@ public class ScrollRect : UIBehaviour, IInitializePotentialDragHandler, IBeginDr
     private DrivenRectTransformTracker m_Tracker;
 #pragma warning restore 649
 
-    protected ScrollRect()
+    protected ScrollRectBase()
     { }
 
     /// <summary>
@@ -808,19 +860,8 @@ public class ScrollRect : UIBehaviour, IInitializePotentialDragHandler, IBeginDr
 
         SetContentAnchoredPosition(position);
     }
-
-    /// <summary>
-    /// Sets the anchored position of the content.
-    /// </summary>
-    [SerializeField]
-    private RectTransform m_ScaleObject = null;
-    private Vector2 m_ContentPos = Vector2.zero;
     public virtual void SetContentAnchoredPosition(Vector2 position)
     {
-        Vector3 scale = m_ScaleObject?.localScale ?? Vector3.one;
-        var maxMoveDis = (Vector2)m_ViewBounds.size - m_Content.sizeDelta;
-        position.x = Mathf.Clamp(position.x, maxMoveDis.x + m_ScaleObject.rect.x / 2 * (scale.x - 1), -m_ScaleObject.rect.x / 2 * (scale.x - 1));
-        position.y = Mathf.Clamp(position.y, maxMoveDis.y + m_ScaleObject.rect.y / 2 * (scale.x - 1), -m_ScaleObject.rect.y / 2 * (scale.y - 1));
         if (!m_Horizontal)
             position.x = m_Content.anchoredPosition.x;
         if (!m_Vertical)
@@ -828,9 +869,8 @@ public class ScrollRect : UIBehaviour, IInitializePotentialDragHandler, IBeginDr
 
         if (position != m_Content.anchoredPosition)
         {
-            m_ContentPos = position - m_Content.anchoredPosition;
-            //m_Content.anchoredPosition = position;
-            //UpdateBounds();
+            m_Content.anchoredPosition = position;
+            UpdateBounds();
         }
     }
 
@@ -838,8 +878,6 @@ public class ScrollRect : UIBehaviour, IInitializePotentialDragHandler, IBeginDr
     {
         if (!m_Content)
             return;
-        m_Content.anchoredPosition += m_ContentPos;
-        m_ContentPos = Vector2.zero;
 
         EnsureLayoutHasRebuilt();
         UpdateBounds();

@@ -61,7 +61,7 @@ public class UIMapFlagPoint : MonoBehaviour
     /// 当前标记点 追踪类型
     /// </summary>
     [SerializeField]
-    public UIMapTracePointType m_TraceType;
+    public EUIMapTracePointType m_TraceType;
     /// <summary>
     /// 图片资源
     /// </summary>
@@ -107,8 +107,8 @@ public class UIMapFlagPoint : MonoBehaviour
 
         #region 强制刷新一下位置
         var pos = UIMapFlagPointManager.Instance.GetFlagPointPosInView(m_Base.m_LocalPosition);
-        m_InViewPos = pos.viewPos;
-        m_Rect.anchoredPosition3D = m_IsTracing ? pos.viewPos : m_Base.m_LocalPosition;
+        m_InViewPos = pos.canvasPos;
+        m_Rect.anchoredPosition3D = m_IsTracing ? pos.canvasPos : m_Base.m_LocalPosition;
         #endregion
 
         return m_IsTracing;
@@ -227,21 +227,21 @@ public class UIMapFlagPoint : MonoBehaviour
     public void OnEnable()
     {
         m_Button.onClick.AddListener(OnButtonClick);
-        UIMapManager.Instance.m_LiftCycle.UpdateFrameRate03 += Update03;
+        UIMapManager.Instance.m_LiftCycle.UpdateFrameRate00 += Update00;
 
     }
     private void OnDisable()
     {
         m_Button.onClick.RemoveAllListeners();
-        UIMapManager.Instance.m_LiftCycle.UpdateFrameRate03 -= Update03;
+        UIMapManager.Instance.m_LiftCycle.UpdateFrameRate00 -= Update00;
     }
-    private void Update03()
+    private void Update00()
     {
         // 设置当前标记点位置
         if (m_IsTracing || m_Base.m_MovementType == EUIMapFlagMoveType.Move)
         {
             var isViewShow = UIMapFlagPointManager.Instance.GetFlagPointPosInView(m_Base.m_LocalPosition);
-            m_InViewPos = isViewShow.viewPos;
+            m_InViewPos = isViewShow.canvasPos;
             m_Rect.anchoredPosition3D = m_IsTracing ?
                 m_InViewPos :
                 m_Base.m_LocalPosition;

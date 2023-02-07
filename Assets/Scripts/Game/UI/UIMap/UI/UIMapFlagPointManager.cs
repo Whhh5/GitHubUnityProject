@@ -41,7 +41,7 @@ public class UIMapFlagPointManager : MonoBehaviour
     /// 当前被追踪点列表
     /// </summary>
     [SerializeField]
-    public Dictionary<UIMapTracePointType, (int count, List<UIMapFlagPoint> list)> m_ListTrace = new();
+    public Dictionary<EUIMapTracePointType, (int count, List<UIMapFlagPoint> list)> m_ListTrace = new();
     /// <summary>
     /// 地图快 -> 标记点列表
     /// </summary>
@@ -58,6 +58,11 @@ public class UIMapFlagPointManager : MonoBehaviour
     /// </summary>
     [SerializeField]
     private RectTransform m_FPITRoot;
+    /// <summary>
+    /// 标记点物体
+    /// </summary>
+    [SerializeField]
+    private RectTransform m_FPITItemParent;
     /// <summary>
     /// 标记点物体
     /// </summary>
@@ -98,11 +103,24 @@ public class UIMapFlagPointManager : MonoBehaviour
     /// </summary>
     [SerializeField, Range(0, 1)]
     float m_FPITRotation = 00.0f;
+    public float FPITRotate
+    {
+        get => m_FPITRotation;
+        set
+        {
+            if (m_FPITRotation != value)
+            {
+                m_FPITRotation = value;
+                UpdateFlagPointInfoType();
+            }
+        }
+    }
     /// <summary>
     /// 标记点显示动画曲线
     /// </summary>
     [SerializeField]
     private AnimationCurve m_FPITEase;
+    float m_TempAngle = 0.0f;
 
     /// <summary>
     /// 存放所有的标记点 表里的 数据
@@ -136,21 +154,20 @@ public class UIMapFlagPointManager : MonoBehaviour
         }
 
         // 初始化追踪类型列表
-        for (int i = 0; i < (int)UIMapTracePointType.EnumCount; i++)
+        for (int i = 0; i < (int)EUIMapTracePointType.EnumCount; i++)
         {
-            m_ListTrace.Add((UIMapTracePointType)i, (999, new()));
+            m_ListTrace.Add((EUIMapTracePointType)i, (999, new()));
         }
 
         // 初始化用户标记点类型列表
         InitFlagPointInfoTypeWindow();
     }
 
-    private void OnEnable()
+    private void Start()
     {
 
     }
-
-    private void Update()
+    private void OnEnable()
     {
 
     }
@@ -158,6 +175,10 @@ public class UIMapFlagPointManager : MonoBehaviour
     private void OnDisable()
     {
 
+    }
+    private void Update()
+    {
+        //UpdateFlagPointInfoType();
     }
 
     private void OnDestroy()
@@ -298,12 +319,12 @@ public class UIMapFlagPointManager : MonoBehaviour
     {
         if (f_Flag.m_ChunkIndex != f_ToIndex)
         {
-            m_DicChunk_Flag[(uint)f_Flag.m_ChunkIndex].list.Remove(f_Flag.m_Base);// Tt
+            m_DicChunk_Flag[(uint)f_Flag.m_ChunkIndex].list.Remove(f_Flag.m_Base);
             if (!m_DicChunk_Flag.ContainsKey((uint)f_ToIndex))
             {
                 m_DicChunk_Flag.Add((uint)f_ToIndex, (null, new()));
             }
-            m_DicChunk_Flag[(uint)f_ToIndex].list.Add(f_Flag.m_Base, f_Flag);// Tt
+            m_DicChunk_Flag[(uint)f_ToIndex].list.Add(f_Flag.m_Base, f_Flag);
             f_Flag.m_ChunkIndex = f_ToIndex;
             UpdateFlagPointUIMapChunkInfo(f_Flag);
         }
@@ -355,7 +376,7 @@ public class UIMapFlagPointManager : MonoBehaviour
     {
         var flagBase = f_FlagPoint.m_Base;
         Push(f_FlagPoint);
-        m_DicChunk_Flag[(uint)flagBase.m_MapPositionInfo.index].list.Remove(flagBase);// Tt
+        m_DicChunk_Flag[(uint)flagBase.m_MapPositionInfo.index].list.Remove(flagBase);
     }
 
 
@@ -373,6 +394,10 @@ public class UIMapFlagPointManager : MonoBehaviour
             && flag != null
             && flag == f_Flag)
         {
+            ChangeTraceStatus(f_Flag.m_Base, false);
+            f_Flag.gameObject.SetActive(false);
+            f_Flag.OnDestroy();
+            UIMapPoolManager.Instance.PoolPush(EUIMapAssetType.UIMapFlagPoint, f_Flag.gameObject);
             value.list[f_BaseData] = null;
         }
         else
@@ -382,10 +407,6 @@ public class UIMapFlagPointManager : MonoBehaviour
         }
 
 
-        ChangeTraceStatus(f_Flag.m_Base, false);
-        f_Flag.gameObject.SetActive(false);
-        f_Flag.OnDestroy();
-        UIMapPoolManager.Instance.PoolPush(EUIMapAssetType.UIMapFlagPoint, f_Flag.gameObject);
     }
     public void Pop(UIMapFlagPointBase f_BaseData, Action<UIMapFlagPoint> f_Callback = null)
     {
@@ -416,6 +437,7 @@ public class UIMapFlagPointManager : MonoBehaviour
                 value.Start();
                 value.SetParameters(f_BaseData);
                 ChangeTraceStatus(f_BaseData, false);
+                UpdateFlagPointScale(m_FPITRoot.localScale.x);
                 f_Callback?.Invoke(value);
             };
         UIMapPoolManager.Instance.PoolPop(EUIMapAssetType.UIMapFlagPoint, GetParent(f_BaseData.m_FlagType), action);
@@ -469,7 +491,10 @@ public class UIMapFlagPointManager : MonoBehaviour
 
         if (m_DicChunk_Flag[(uint)f_FlagPointBase.m_MapPositionInfo.index].list[f_FlagPointBase] == null)
         {
-            if (f_IsTrace == false) return;
+            if (!(f_IsTrace ?? false))
+            {
+                return;
+            }
             Pop(f_FlagPointBase, (flagPoint) => Context(flagPoint));
         }
         else
@@ -497,6 +522,7 @@ public class UIMapFlagPointManager : MonoBehaviour
             else
             {
                 list.Remove(flagPoint);
+                m_ListTrace[flagPoint.m_TraceType].list.Remove(flagPoint);
             }
             flagPoint.ChangeTrace(f_IsTrace);
             UpdateFlagPointUIMapChunkInfo(flagPoint);
@@ -526,12 +552,12 @@ public class UIMapFlagPointManager : MonoBehaviour
             if (Mathf.Abs(angle) - tangle > 0)
             {
                 var UB = centreLocalPos.y > 0 ? 1 : -1;
-                isViewShow.viewPos = 0.5f * customView.y * UB * new Vector2(1 / line1K, 1);
+                isViewShow.canvasPos = 0.5f * customView.y * UB * new Vector2(1 / line1K, 1);
             }
             else
             {
                 var UB = centreLocalPos.x > 0 ? 1 : -1;
-                isViewShow.viewPos = 0.5f * customView.x * UB * new Vector2(1, line1K);
+                isViewShow.canvasPos = 0.5f * customView.x * UB * new Vector2(1, line1K);
             }
         }
         return isViewShow;
@@ -552,9 +578,20 @@ public class UIMapFlagPointManager : MonoBehaviour
         {
             item.GetComponent<RectTransform>().localScale = Vector3.one * f_ToScale;
         }
-
+        m_FPITRoot.localScale = Vector3.one * f_ToScale;
     }
 
+    /// <summary>
+    /// 更新当前图标重叠
+    /// </summary>
+    public void UpdateIconOverlap(float f_Distance)
+    {
+        // 取周围点的中间值
+    }
+
+    /// <summary>
+    /// 更新地图标记点的缩放
+    /// </summary>
     public void UpdateFlagStateByUIMapSatus()
     {
         DOTween.Kill(EUIMapDGIDType.UpdateFlagStateByUIMapSatus);
@@ -628,7 +665,7 @@ public class UIMapFlagPointManager : MonoBehaviour
         {
             var index = i;
 
-            var obj = GameObject.Instantiate<RectTransform>(m_FPITItem, m_FPITItem.parent);
+            var obj = GameObject.Instantiate<RectTransform>(m_FPITItem, m_FPITItemParent);
 
             obj.gameObject.SetActive(false);
 
@@ -655,7 +692,7 @@ public class UIMapFlagPointManager : MonoBehaviour
 
         #region 初始化 DoTween 动画
         var localScale = m_FPITItem.localScale;
-        m_FPITItem.GetComponent<Image>().maskable = false;
+        //m_FPITItem.GetComponent<Image>().maskable = false;
         DOTween.To(() => 0.0f, (value) =>
             {
                 m_FPITRadius = value * 100.0f;
@@ -703,6 +740,7 @@ public class UIMapFlagPointManager : MonoBehaviour
             DOTween.PlayForward(EUIMapDGIDType.ShowFlagPointInfoTypeWindow);
         }
     }
+
     /// <summary>
     /// 显示标记点选择窗口
     /// </summary>
@@ -754,7 +792,7 @@ public class UIMapFlagPointManager : MonoBehaviour
         startAngle += m_FPITMoveAngle;
 
         var viewCount = Mathf.Min(maxShowNum + startIndex + Mathf.Min(Mathf.CeilToInt(m_FPITRotation), 1), m_ListFPIT.Count);
-        for (int i = startIndex; i < viewCount; i++)
+        for (int i = 0; i < m_ListFPIT.Count; i++)
         {
             var listIndex = i;
 

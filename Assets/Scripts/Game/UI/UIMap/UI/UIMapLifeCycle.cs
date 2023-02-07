@@ -17,7 +17,7 @@ public class UIMapLifeCycle : MonoBehaviour
     private void OnEnable()
     {
         m_CurTime = 0.0f;
-        StartCoroutine(IEUpdate00());
+        //StartCoroutine(IEUpdate00());
         StartCoroutine(IEUpdate01());
         StartCoroutine(IEUpdate03());
         StartCoroutine(IEUpdate05());
@@ -29,6 +29,7 @@ public class UIMapLifeCycle : MonoBehaviour
     {
         m_CurTime += Time.deltaTime;
         m_Frames = 1f / Time.deltaTime;
+        UpdateFrameRate00?.Invoke();
     }
 
     private void OnDisable()
@@ -37,14 +38,14 @@ public class UIMapLifeCycle : MonoBehaviour
     }
 
 
-    private IEnumerator IEUpdate00()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(0.0f);
-            UpdateFrameRate00?.Invoke();
-        }
-    }
+    //private IEnumerator IEUpdate00()
+    //{
+    //    while (true)
+    //    {
+    //        yield return new WaitForSeconds(0.0f);
+    //        UpdateFrameRate00?.Invoke();
+    //    }
+    //}
     private IEnumerator IEUpdate01()
     {
         while (true)

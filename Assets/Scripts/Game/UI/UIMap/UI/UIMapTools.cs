@@ -103,7 +103,7 @@ public enum EUIMapFlagPointType
     EnumCount,
 }
 
-public enum UIMapTracePointType
+public enum EUIMapTracePointType
 {
     None,
     Type1,
@@ -161,6 +161,13 @@ public enum EUIMapDGIDType
     ShowFlagPointInfoTypeWindow,
     ChangMapScaleTo,
     UpdateFlagStateByUIMapSatus,
+    EnumCount,
+}
+
+public enum EUIMapClick : ushort
+{
+    ChangeMapStatus,
+    ChangeMapChunkStatus,
     EnumCount,
 }
 #endregion

@@ -54,13 +54,14 @@ public class UIMapPoolManager : MonoBehaviour
     {
         if (f_AssetType == EUIMapAssetType.EnumCount)
         {
-            foreach (var item in m_AssetsType_Instance)
+            var list = m_AssetsType_Instance;
+            m_AssetsType_Instance = new();
+            foreach (var item in list)
             {
                 foreach (var item2 in item.Value)
                     if (item2 != null) GameObject.Destroy(item2);
                 UIMapAssetsManager.Instance.UnloadGameObjectAssets($"{UIMapPath.m_PrefabPath}{item.Key}");
             }
-            m_AssetsType_Instance = new();
         }
         else if (m_AssetsType_Instance.TryGetValue(f_AssetType, out var value))
         {
