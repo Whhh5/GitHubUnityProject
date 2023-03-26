@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace B1.UI
+namespace B1
 {
-    public enum EUIRoot : ushort
+    public enum EUIAppRoot : ushort
     {
         None,
         Scene,
@@ -15,9 +15,12 @@ namespace B1.UI
         System,
         EnumCount,
     }
-    public enum EPrefab : ulong
+    public enum EAssetName : ulong
     {
-        #region UILobby
+        None = ulong.MinValue,
+
+        #region 预制体
+        #region UILogin
         UILogin,
         #endregion
 
@@ -36,6 +39,29 @@ namespace B1.UI
         UINavigationBar,
         #endregion
 
+        #region UIAppPlane
+        UIAppPlane,
+        #endregion
+
+        #endregion
+
+
+
+        #region 图集
+
+        UILobbySpriteAltas,
+
+
+        #endregion
+
+        EnumCount,
+    }
+    public enum ESpriteName
+    {
+        Caiji_cj_famutubiao,
+        Caiji_cj_shougetubiao,
+        Caiji_cj_wakuangtubiao,
+        Caiji_cj_zhipitubiao,
         EnumCount,
     }
     public enum EUIWindowPage : int
@@ -43,31 +69,8 @@ namespace B1.UI
         None,
         UILoginPage,
         UILobbyPage,
+        UIAppPlanePage,
         UIMapPage,
-        UILoginPage1,
-        UILobbyPage1,
-        UIMapPage1,
-        UILoginPage3,
-        UILobbyPage3,
-        UIMapPage3,
-        UILoginPage4,
-        UILobbyPage4,
-        UIMapPage4,
-        UILoginPage5,
-        UILobbyPage5,
-        UIMapPage5,
-        UILoginPage6,
-        UILobbyPage6,
-        UIMapPage6,
-        UILoginPage7,
-        UILobbyPage7,
-        UIMapPage7,
-        UILoginPage8,
-        UILobbyPage8,
-        UIMapPage8,
-        UILoginPage9,
-        UILobbyPage9,
-        UIMapPage9,
         EnumCount,
     }
     public enum EScrollViewListItem
@@ -77,5 +80,34 @@ namespace B1.UI
     public interface IUIWindowPage
     {
 
+    }
+
+
+
+    public enum EAssetLable
+    {
+        Prefab,
+        Sprite,
+        spriteAtlas,
+        EnumCount,
+    }
+
+
+    public interface IAppRoot
+    {
+        EUIAppRoot AppRoot { get; }
+    }
+    public interface IOnDestroyAsync
+    {
+        /// <summary>
+        /// 当对象被加载出来首先被调用
+        /// </summary>
+        /// <returns></returns>
+        UniTask OnLoadAsync();
+        /// <summary>
+        /// 当对象被卸载调用
+        /// </summary>
+        /// <returns></returns>
+        UniTask OnDestroyAsync();
     }
 }

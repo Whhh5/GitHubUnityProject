@@ -1,25 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace B1
 {
-    public class MonoBase : MonoBehaviour, Log
+    public class MonoBase : MonoBehaviour, ILog
     {
-        public void Log<T>(T message)
+        protected void Log<T>(T message)
         {
             Debug.Log($" 【 {GetType()} 】\n{message}");
         }
-        public void LogError<T>(T message)
+        protected void LogError<T>(T message)
         {
             Debug.LogError($" 【 {GetType()} 】\n{message}");
         }
-        public void LogWarning<T>(T message)
+        protected void LogWarning<T>(T message)
         {
             Debug.LogWarning($" 【 {GetType()} 】\n{message}");
         }
-
-        public virtual void Awake() { }
-        public virtual void OnDestroy() { }
+        protected async UniTask DelayAsync(int f_DeltaTime = 0)
+        {
+            await UniTask.Delay(f_DeltaTime);
+        }
+        protected virtual void Awake() { }
+        protected virtual void OnDestroy() { }
     }
 }

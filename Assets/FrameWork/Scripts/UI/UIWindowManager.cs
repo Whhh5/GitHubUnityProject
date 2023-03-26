@@ -11,17 +11,17 @@ namespace B1.UI
 {
     public sealed class UIWindowManager : MonoSingleton<UIWindowManager>
     {
-        ListStack<Type, UIWindowPage> m_PageStack = new("UI Window Stack Info");
+        private DicStack<Type, UIWindowPage> m_PageStack = new("UI Window Stack Info");
 
-        public override void Awake()
+        protected override void Awake()
         {
             base.Awake();
-
-            for (int i = 0; i < (int)EUIRoot.EnumCount; i++)
+            // 初始化 UI 层级
+            for (int i = 0; i < (int)EUIAppRoot.EnumCount; i++)
             {
-                if (transform.Find($"{(EUIRoot)i}") == null)
+                if (transform.Find($"{(EUIAppRoot)i}") == null)
                 {
-                    var obj = new GameObject($"{(EUIRoot)i}");
+                    var obj = new GameObject($"{(EUIAppRoot)i}");
                     var rect = obj.AddComponent<RectTransform>();
                     rect.SetParent(transform);
                     rect.anchorMin = Vector2.zero;
@@ -35,6 +35,11 @@ namespace B1.UI
         }
 
         #region Page
+        /// <summary>
+        /// 打开一个 page
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public async UniTask<T> OpenPageAsync<T>() where T : UIWindowPage, new()
         {
             var key = typeof(T);
@@ -49,9 +54,13 @@ namespace B1.UI
             {
                 Log($"重复开启 UI Window Page 已经被打开  key = {key}   value = {value}");
             }
-            await UpdateUINavigationBarAsync();
             return m_PageStack[key] as T;
         }
+        /// <summary>
+        /// 打开一个 page
+        /// </summary>
+        /// <param name="f_Type"></param>
+        /// <returns></returns>
         private async UniTask OpenPageAsync(Type f_Type)
         {
             await UniTask.Delay(0);
@@ -73,8 +82,12 @@ namespace B1.UI
             {
                 Log($"重复开启 UI Window Page 已经被打开  key = {f_Type}   value = {value}");
             }
-            await UpdateUINavigationBarAsync();
         }
+        /// <summary>
+        /// 打开一个 page
+        /// </summary>
+        /// <param name="f_EUIWindowPage"></param>
+        /// <returns></returns>
         public async UniTask OpenPageAsync(EUIWindowPage f_EUIWindowPage)
         {
             var type = Type.GetType(f_EUIWindowPage.ToString());
@@ -84,7 +97,6 @@ namespace B1.UI
                 return;
             }
             await OpenPageAsync(type);
-            await UpdateUINavigationBarAsync();
         }
         /// <summary>
         /// 关闭栈顶 page
@@ -95,10 +107,14 @@ namespace B1.UI
             if (m_PageStack.TryPop(out var value))
             {
                 await value.CloseAsync();
-                await UpdateUINavigationBarAsync();
             }
         }
-        public async UniTask<T> GetPageAsyn<T>() where T : UIWindowPage
+        /// <summary>
+        /// 获取一个 page
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public async UniTask<T> GetPageAsync<T>() where T : UIWindowPage
         {
             await UniTask.Delay(0);
             T retPage = default(T);
@@ -115,7 +131,12 @@ namespace B1.UI
         #endregion
 
         #region 工具 tool
-        public async UniTask<Transform> GetUIRootAsync(EUIRoot f_EUIRoot)
+        /// <summary>
+        /// 获取 ui 层级父对象
+        /// </summary>
+        /// <param name="f_EUIRoot"></param>
+        /// <returns></returns>
+        public async UniTask<Transform> GetUIRootAsync(EUIAppRoot f_EUIRoot)
         {
             await UniTask.Delay(0);
             return transform.Find($"{f_EUIRoot}");
@@ -123,16 +144,23 @@ namespace B1.UI
         #endregion
 
         #region 加载 load
-        public async UniTask<T> LoadWindowAsync<T>(EPrefab f_EWindow, EUIRoot f_EUIRoot)
+        /// <summary>
+        /// 加载一个 UI window 窗口
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="f_EWindow"></param>
+        /// <returns></returns>
+        public async UniTask<T> LoadWindowAsync<T>(EAssetName f_EWindow)
             where T : UIWindow
         {
             T window = default(T);
-            var parent = await GetUIRootAsync(f_EUIRoot);
-            var result = await AssetsManager.Instance.LoadPrefabAsync<T>(f_EWindow, parent);
+            var result = await AssetsManager.Instance.LoadPrefabAsync<T>(f_EWindow, null);
             if (result.result == true && result.obj != null)
             {
                 window = result.obj;
-                window.m_AppRoot = f_EUIRoot;
+                var parent = await GetUIRootAsync(window.AppRoot);
+                window.transform.SetParent(parent);
+                window.Rect.NormalFullScene();
                 await window.AwakeAsync();
 
                 EventManager.Instance.FireEvent(EEvent.UI_WINDOW_LOAD_FINISH, window, f_EWindow.ToString());
@@ -146,10 +174,15 @@ namespace B1.UI
 
             return window;
         }
-
-        public async UniTask UnloadWindowAsync(EPrefab f_EWindow, GameObject f_Obj)
+        /// <summary>
+        /// 写在一个 UI window 窗口
+        /// </summary>
+        /// <param name="f_EWindow"></param>
+        /// <param name="f_Obj"></param>
+        /// <returns></returns>
+        public async UniTask UnloadWindowAsync(EAssetName f_EWindow, UIWindow f_Obj)
         {
-            await AssetsManager.Instance.UnloadAsync(f_EWindow, EAssetLable.Prefab, f_Obj);
+            await AssetsManager.Instance.UnLoadPrefabAsync(f_EWindow, EAssetLable.Prefab, f_Obj);
 
             LogWarning($"卸载窗口    f_EWindow = {f_EWindow} ");
 
@@ -157,28 +190,5 @@ namespace B1.UI
         #endregion
 
 
-
-
-
-
-        #region 特殊 other
-        public UINavigationBar m_Navigation = null;
-        /// <summary>
-        /// 更新 page 返回按钮
-        /// </summary>
-        /// <returns></returns>
-        public async UniTask UpdateUINavigationBarAsync()
-        {
-            if (m_PageStack.Count > 0)
-            {
-                m_Navigation ??= await LoadWindowAsync<UINavigationBar>(EPrefab.UINavigationBar, EUIRoot.System);
-            }
-            else if (m_Navigation != null)
-            {
-                await UnloadWindowAsync(EPrefab.UINavigationBar, m_Navigation.gameObject);
-                m_Navigation = null;
-            }
-        }
-        #endregion
     }
 }

@@ -13,7 +13,7 @@ namespace B1
         [RuntimeInitializeOnLoadMethod]
         public static async void StartGame()
         {
-            await AssetsManager.Instance.LoadPrefabAsync<UGUISystem>(EPrefab.UGUISystem, null);
+            await AssetsManager.Instance.LoadPrefabAsync<UGUISystem>(EAssetName.UGUISystem, null);
             await UIWindowManager.Instance.OpenPageAsync<UILobbyPage>();
 
 

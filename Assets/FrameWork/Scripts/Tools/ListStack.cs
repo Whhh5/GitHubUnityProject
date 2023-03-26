@@ -16,9 +16,32 @@ public class ListStack<T> : Base
 
     }
     private List<T> m_List = new();
-    public uint m_Pointer { get; private set; } = 0;
+    private uint m_Pointer = 0;
+    public uint Count => m_Pointer;
+
     private uint m_AddCount = 0;
 
+    public T this[int key]
+    {
+        get
+        {
+            return m_List[key];
+        }
+    }
+    public bool TryValue(out T f_Value)
+    {
+        f_Value = default(T);
+        if (m_Pointer > 0)
+        {
+            f_Value = m_List[(int)m_Pointer - 1];
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        
+    }
 
     public bool TryPop(out T value)
     {
@@ -64,9 +87,19 @@ public class ListStack<T> : Base
         }
         Log(str);
     }
+
+    public IEnumerable<KeyValuePair<int, T>> GetEnumerator()
+    {
+        for (int i = 0; i < m_Pointer; i++)
+        {
+            var index = i;
+            var tempItem = m_List[index];
+            yield return new KeyValuePair<int, T>(index, tempItem);
+        }
+    }
 }
 
-public class ListStack<TKey, TValue> : Base
+public class DicStack<TKey, TValue> : Base
 {
     public TValue this[TKey key]
     {
@@ -78,7 +111,7 @@ public class ListStack<TKey, TValue> : Base
 
 
     private string m_Message = null;
-    public ListStack(string f_Message, uint count = 10)
+    public DicStack(string f_Message, uint count = 10)
     {
         count = count <= 0 ? 1 : count;
         m_KeyStack = new ListStack<TKey>(f_Message, count);
@@ -88,8 +121,7 @@ public class ListStack<TKey, TValue> : Base
     }
     private Dictionary<TKey, TValue> m_Dic = null;
     private ListStack<TKey> m_KeyStack = null;
-    public uint Count => m_KeyStack.m_Pointer;
-
+    public uint Count => m_KeyStack.Count;
 
     public bool TryPop(out TValue f_Value)
     {
@@ -141,5 +173,13 @@ public class ListStack<TKey, TValue> : Base
                 $"\n}}";
         }
         Log(str);
+    }
+
+    public IEnumerator<KeyValuePair<TKey,TValue>> GetEnumerator()
+    {
+        foreach (var item in m_Dic)
+        {
+            yield return item;
+        }
     }
 }

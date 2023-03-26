@@ -1,11 +1,11 @@
-using B1;
-using B1.UI;
-using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using B1;
+using B1.UI;
+using Cysharp.Threading.Tasks;
 
-public class UINavigationBarPage : UIWindowPage
+public class UIAppPlanePage : UIWindowPage
 {
     protected override EAssetName SpriteAltas => EAssetName.None;
 
@@ -13,7 +13,7 @@ public class UINavigationBarPage : UIWindowPage
     {
         return new List<EAssetName>()
         {
-            EAssetName.UILobbyNavigationBar
+            EAssetName.UIAppPlane,
         };
     }
 }

@@ -60,7 +60,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
@@ -82,6 +81,7 @@ GameObject:
   - component: {fileID: 3559910782730716640}
   - component: {fileID: 7476929910172439012}
   - component: {fileID: 7602505763068015679}
+  - component: {fileID: 3830096444754505838}
   m_Layer: 5
   m_Name: UGUISystem
   m_TagString: Untagged
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!114 &7476929910172439012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,6 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d55b3464438114bd7ad864a7568dc3f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Navigation: {fileID: 0}
 --- !u!114 &7602505763068015679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,3 +196,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02bc2ab229b2747e29a9e05803743bb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!225 &3830096444754505838
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5464523194066880605}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

@@ -1,11 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
+using B1;
 using B1.UI;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIAppPlane : UIWindow
 {
+    [SerializeField]
+    private Button m_OpenLobbyBtn = null;
+
+    public override async UniTask AwakeAsync()
+    {
+        await DelayAsync();
+        m_OpenLobbyBtn.onClick.AddListener(async () => await UIWindowManager.Instance.OpenPageAsync<UILobbyPage>());
+    }
+
+    public override async UniTask OnShowAsync()
+    {
+        await DelayAsync();
+
+    }
     public override async UniTask ShowAsync()
     {
         await base.ShowAsync();
@@ -14,6 +30,14 @@ public class UIAppPlane : UIWindow
     public override async UniTask HideAsync()
     {
         await base.HideAsync();
+    }
+
+    protected override void OnDestroy()
+    {
+        m_OpenLobbyBtn.onClick.RemoveAllListeners();
+
+
+        base.OnDestroy();
     }
 
     #region Data
@@ -64,6 +88,7 @@ public class UIAppPlane : UIWindow
             m_ListIsSelect.RemoveAt(index);
         }
     }
+
     #endregion
 
 }

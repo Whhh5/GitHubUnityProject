@@ -14,13 +14,18 @@ public class UINavigationBar : UIWindow
 
     public override async UniTask AwakeAsync()
     {
-        await base.AwakeAsync();
-
+        await DelayAsync();
         m_BtnRetreat.onClick.AddListener(async () =>
             {
                 await UIWindowManager.Instance.ClosePageAsync();
             });
 
+
+    }
+
+    public override async UniTask OnShowAsync()
+    {
+        await DelayAsync();
 
     }
 }

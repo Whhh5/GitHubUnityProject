@@ -47,6 +47,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - Prefab
+  - m_GUID: c4cb704fb6500431aba93bc6942e5d7c
+    m_Address: UILobbySpriteAltas
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SpriteAltas
+  - m_GUID: 0dafae0900bec46f1927caef67bdf8d2
+    m_Address: UIAppPlane
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Prefab
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 056db3dee3486459a9eb7c3820ef1dcd, type: 2}
   m_SchemaSet:

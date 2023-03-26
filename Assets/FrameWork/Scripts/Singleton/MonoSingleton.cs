@@ -8,7 +8,7 @@ namespace B1
         where T : MonoSingleton<T>
     {
         public static T Instance = null;
-        public override void Awake()
+        protected override void Awake()
         {
             Instance = Instance == null ? (T)this : Instance;
         }

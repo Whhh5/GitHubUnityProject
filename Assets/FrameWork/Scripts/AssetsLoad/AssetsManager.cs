@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using B1.UI;
 using Cysharp.Threading.Tasks;
@@ -12,34 +13,209 @@ namespace B1
 {
     public class AssetsManager : Singleton<AssetsManager>
     {
-        private string GetAssetKey<TKey>(TKey f_Key, EAssetLable f_Lable) where TKey : struct => $"{f_Key}.{f_Lable}";
+        private string GetAssetKey(EAssetName f_Key, EAssetLable f_Lable) => $"{f_Key}.{f_Lable}";
 
-        Dictionary<string, (Type type, bool isIns, object assets, List<GameObject> objs)> m_DicAssets = new();
-        private async UniTask<T> LoadAsync<T>(string f_Key, string f_Lable) where T : class
+        /// <summary>
+        /// 场景加载的资源列表
+        /// </summary>
+        Dictionary<string, (Type type, bool isIns, object assets, Dictionary<int, GameObject> objs)> m_DicAssets = new();
+        #region 公用方法
+        /// <summary>
+        /// 加载一个资源
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="f_Key"></param>
+        /// <returns></returns>
+        private async UniTask<T> LoadAsync<T>(EAssetName f_Key, EAssetLable f_Lable) where T : class
         {
-            List<string> key = new List<string> { f_Key };
-            var asset = await Addressables.LoadAssetAsync<GameObject>(f_Key);
+            var asset = await Addressables.LoadAssetAsync<T>(f_Key.ToString());
             #region Console
             var color = asset != null ? "00FF00FF" : "FF0000FF";
             LogWarning($"加载资源  result = {asset != null}   <color=#{color}>path = {f_Key} </color>   ");
             #endregion
-            return asset.GetComponent<T>();
+            return asset;
+        }
+        private async UniTask UnLoadAsync<T>(T f_Asset)
+        {
+            await DelayAsync();
+            Addressables.Release<T>(f_Asset);
+        }
+        /// <summary>
+        /// 卸载一个资源
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="f_Key"></param>
+        /// <param name="f_Obj"></param>
+        /// <returns></returns>
+        public async UniTask UnloadAsync(EAssetName f_Asset, EAssetLable f_Lable, int f_Key)
+        {
+            var disKey = GetAssetKey(f_Asset, f_Lable);
+            if (!m_DicAssets.TryGetValue(disKey, out var value))
+            {
+                LogError($"正在卸载一个没有加载的资源      dicKey = {f_Asset}     f_Key = {f_Key}");
+                return;
+            }
+
+            
+            // 判断 该对象是否引用了该资源
+            if (value.objs.ContainsKey(f_Key))
+            {
+                value.objs.Remove(f_Key);
+                // 判断当前资源是否是实例化对象
+            }
+            else
+            {
+                LogError($"该对象没有引用 当前资源      dicKey = {disKey}  ");
+            }
+
+            // 判断是否从内存中移除资源
+            if (value.objs.Count <= 0)
+            {
+                await UnLoadAsync(value.assets);
+                m_DicAssets.Remove(disKey);
+            }
+        }
+        /// <summary>
+        /// 卸载一个继承 mono 的预制体资源
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="f_Asset"></param>
+        /// <param name="f_Lable"></param>
+        /// <param name="f_Obj"></param>
+        /// <returns></returns>
+        public async UniTask UnLoadPrefabAsync<T>(EAssetName f_Asset, EAssetLable f_Lable, T f_Obj) where T : UnityEngine.MonoBehaviour, IOnDestroyAsync
+        {
+            var disKey = GetAssetKey(f_Asset, f_Lable);
+            if (!m_DicAssets.TryGetValue(disKey, out var value))
+            {
+                LogError($"正在卸载一个没有加载的资源      dicKey = {f_Asset}     f_Obj = {f_Obj}");
+                return;
+            }
+
+            // 设置是否卸载实例化的对象
+            var insID = f_Obj.GetInstanceID();
+
+            // 判断 该对象是否引用了该资源
+            if(value.objs.ContainsKey(insID))
+            {
+                var coms = f_Obj.GetComponents<IOnDestroyAsync>();
+                foreach (var com in coms)
+                {
+                    await com.OnDestroyAsync();
+                }
+                GameObject.Destroy(f_Obj);
+
+
+                await UnloadAsync(f_Asset, f_Lable, insID);
+
+            }
+        }
+        /// <summary>
+        /// 卸载一个类型全部资源
+        /// </summary>
+        /// <param name="f_Asset"></param>
+        /// <param name="f_Lable"></param>
+        /// <returns></returns>
+        public async UniTask UnLoadByTypeAsync(EAssetName f_Asset, EAssetLable f_Lable)
+        {
+            var disKey = GetAssetKey(f_Asset, f_Lable);
+            if (!m_DicAssets.TryGetValue(disKey, out var value))
+            {
+                LogError($"正在卸载一个没有加载的资源      dicKey = {f_Asset}     f_Lable = {f_Lable}");
+                return;
+            }
+            if (value.isIns)
+            {
+                List<UniTask> tasks = new();
+                foreach (var item in value.objs)
+                {
+                    var tempItem = item;
+                    tasks.Add(UniTask.Create(async () =>
+                    {
+                        var coms = tempItem.Value.GetComponents<IOnDestroyAsync>();
+                        foreach (var com in coms)
+                        {
+                            await com.OnDestroyAsync();
+                        }
+                        GameObject.Destroy(tempItem.Value);
+
+                        await UnloadAsync(f_Asset, f_Lable, tempItem.Key);
+
+                    }));
+                }
+                await UniTask.WhenAll(tasks);
+            }
         }
 
-        public async UniTask<(bool result, T obj)> LoadPrefabAsync<T>(EPrefab f_EPrefab, Transform f_Parent) where T : MonoBehaviour
+        public async UniTask<(bool tResult, TAsset tObj)> LoadAssetAsync<TAsset>(EAssetName f_Name, EAssetLable f_Lable, int f_key)
+            where TAsset : UnityEngine.Object
+        {
+            
+            var dicKey = GetAssetKey(f_Name, f_Lable);
+            var resuult = false;
+            TAsset obj = null;
+            if (m_DicAssets.TryGetValue(dicKey, out var value))
+            {
+                if (value.assets is TAsset)
+                {
+                    obj = value.assets as TAsset;
+                    if (!value.objs.ContainsKey(f_key))
+                    {
+                        value.objs.Add(f_key, null);
+                    }
+                    else
+                    {
+                        LogWarning("该 key 已经请求过该资源    请检查此处是否合理，合理则忽略该消息");
+                    }
+                    resuult = true;
+                }
+                else
+                {
+                    LogError($"加载资源失败， 传入类型和已经存在的资源类型不符， 已经存在的资源：{value.assets.GetType()},  请求类型：{typeof(TAsset)}");
+                }
+            }
+            else
+            {
+                var loadRes = await LoadAsync<TAsset>(f_Name, f_Lable);
+                if (loadRes !=null)
+                {
+                    obj = loadRes;
+
+                    m_DicAssets.Add(dicKey, (typeof(TAsset), false, loadRes, new() { { f_key, null } }));
+
+                    resuult = true;
+                }
+            }
+
+            return (resuult, obj);
+        }
+        #endregion
+
+
+
+        #region 预制体相关
+        /// <summary>
+        /// 加载一个继承 mono 的预制体, 该方法加载的预制体只能存在一个
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="f_EPrefab"></param>
+        /// <param name="f_Parent"></param>
+        /// <returns></returns>
+        public async UniTask<(bool result, T obj)> LoadPrefabAsync<T>(EAssetName f_EPrefab, Transform f_Parent = null) where T : MonoBehaviour
         {
             T obj = default(T);
             bool result = false;
             var dicKey = GetAssetKey(f_EPrefab, EAssetLable.Prefab);
             if (!m_DicAssets.TryGetValue(dicKey, out var value))
             {
-                var asset = await LoadAsync<T>(f_EPrefab.ToString(), EAssetLable.Prefab.ToString());
-                if (asset != null)
+                var asset = await LoadAsync<GameObject>(f_EPrefab, EAssetLable.Prefab);
+                var com = asset?.GetComponent<T>();
+                if (com != null)
                 {
                     result = true;
-                    obj = GameObject.Instantiate<T>(asset, f_Parent);
+                    obj = GameObject.Instantiate<T>(com, f_Parent);
                     m_DicAssets.Add(dicKey, (typeof(T), true, asset, new()));
-                    m_DicAssets[dicKey].objs.Add(obj.gameObject);
+                    m_DicAssets[dicKey].objs.Add(obj.gameObject.GetInstanceID(), obj.gameObject);
                     LogWarning($"加载预制体实例化成功   Component = {typeof(T)}   path = {dicKey}");
                 }
                 else
@@ -47,25 +223,25 @@ namespace B1
                     LogWarning($"资源加载失败  asset path = {dicKey}");
                 }
             }
-            else if (value.objs.Count > 0 && value.objs[0] != null)
+            else if (value.objs.Count > 0)
             {
-                if (value.objs[0].TryGetComponent(out obj))
+                var firstElement = value.objs.First();
+                if (firstElement.Value.TryGetComponent(out obj))
                 {
                     LogWarning("该资源已经加载过还没有卸载  当前读取的是之前就已经加载过的实例");
                 }
                 else
                 {
-                    LogWarning($"该对象没有该组件   object name = {value.objs[0].name}   Component = {typeof(T)}");
+                    LogWarning($"该对象没有该组件   id = {firstElement.Key}  object name = {firstElement.Value?.name}   Component = {typeof(T)}");
                 }
             }
             else
             {
                 if (value.assets as T != null)
                 {
-                    value.objs = new List<GameObject>();
                     result = true;
                     obj = GameObject.Instantiate<T>(value.assets as T);
-                    value.objs.Add(obj.gameObject);
+                    value.objs.Add(obj.gameObject.GetInstanceID(), obj.gameObject);
                     LogWarning($"实例化预制体成功   Component = {typeof(T)}   path = {dicKey}");
                 }
                 else
@@ -75,8 +251,14 @@ namespace B1
             }
             return (result, obj);
         }
-
-        public async UniTask<T> LoadPoolPrefabAsync<T>(EPrefab f_EPrefab, Transform f_Parent) where T : MonoBehaviour
+        /// <summary>
+        /// 该方法加载预制体允许存在多个
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="f_EPrefab"></param>
+        /// <param name="f_Parent"></param>
+        /// <returns></returns>
+        public async UniTask<T> LoadPrefabsAsync<T>(EAssetName f_EPrefab, Transform f_Parent = null) where T : MonoBehaviour, IOnDestroyAsync
         {
             T obj = default(T);
             var dicKey = GetAssetKey(f_EPrefab, EAssetLable.Prefab);
@@ -85,7 +267,8 @@ namespace B1
                 if (value.assets as T != null)
                 {
                     obj = GameObject.Instantiate<T>(value.assets as T, f_Parent);
-                    m_DicAssets[dicKey].objs.Add(obj.gameObject);
+                    await obj.OnLoadAsync();
+                    m_DicAssets[dicKey].objs.Add(obj.gameObject.GetInstanceID(), obj.gameObject);
                     LogWarning($"实例化预制体成功   Component = {typeof(T)}   path = {dicKey}");
                 }
                 else
@@ -96,9 +279,10 @@ namespace B1
             else
             {
                 var result = await LoadPrefabAsync<T>(f_EPrefab, f_Parent);
-                if (result.obj != null)
+                if (result.result)
                 {
                     obj = result.obj;
+                    await obj.OnLoadAsync();
                     LogWarning($"加载实例化预制体成功   Component = {typeof(T)}   path = {dicKey}");
                 }
                 else
@@ -109,116 +293,8 @@ namespace B1
             return obj;
         }
 
-        public async void LoadPrefab<TMono, TUserData>(
-            EPrefab f_EPrefab, Transform f_Parent, TUserData f_UserData, Action<TMono, TUserData> f_Callback)
-                where TMono : MonoBehaviour
-        {
-            var result = await LoadPrefabAsync<TMono>(f_EPrefab, f_Parent);
-            f_Callback.Invoke(result.obj, f_UserData);
-        }
 
-        public async void LoadPoolPrefab<TMono, TUserData>(
-            EPrefab f_EPrefab, Transform f_Parent, TUserData f_UserData, Action<TMono, TUserData> f_Callback)
-                where TMono : MonoBehaviour
-        {
-            var obj = await LoadPoolPrefabAsync<TMono>(f_EPrefab, f_Parent);
-            f_Callback.Invoke(obj, f_UserData);
-        }
-
-
-        /// <summary>
-        /// 卸载一个资源或者多个资源  <see langword="if ( f_Obj == null )" />     并且资源存在 则卸载所有使用该资源的对象
-        /// </summary>
-        /// <typeparam name="TKey"></typeparam>
-        /// <param name="f_Key"></param>
-        /// <param name="f_Obj"></param>
-        /// <returns></returns>
-        public async UniTask UnloadAsync(string f_Key, GameObject f_Obj)
-        {
-            if (!m_DicAssets.TryGetValue(f_Key, out var value))
-            {
-                LogError($"正在卸载一个没有加载的资源      dicKey = {f_Key}     f_Obj = {f_Obj}");
-                return;
-            }
-
-            // 设置是否卸载实例化的对象
-            var baseType = Type.GetType("GameObject");
-
-            // 判断卸载资源类型   单个 or 多个
-            if (f_Obj == null)
-            {
-                // 判断当前资源是否是实例化对象
-                if (value.isIns)
-                {
-                    List<UniTask> tasks = new();
-                    foreach (var item in value.objs)
-                    {
-                        if (item != null)
-                        {
-                            var obj = item;
-                            tasks.Add(UniTask.Create(async () =>
-                            {
-                                var coms = obj.GetComponents<IOnDestroyAsync>();
-                                foreach (var com in coms)
-                                {
-                                    await com.OnDestroyAsync();
-                                }
-                                GameObject.Destroy(obj);
-                            }));
-                        }
-                    }
-                    await UniTask.WhenAll(tasks);
-                }
-                value.objs = new();
-            }
-            // 判断 该对象是否引用了该资源
-            else if (value.objs.Contains(f_Obj))
-            {
-                value.objs.Remove(f_Obj);
-                // 判断当前资源是否是实例化对象
-                if (value.isIns)
-                {
-                    var coms = f_Obj.GetComponents<IOnDestroyAsync>();
-                    foreach (var com in coms)
-                    {
-                        await com.OnDestroyAsync();
-                    }
-                    GameObject.Destroy(f_Obj);
-                }
-            }
-            else
-            {
-                LogError($"该对象没有引用 当前资源    f_Obj = {f_Obj}     dicKey = {f_Key}  ");
-            }
-
-            // 判断是否从内存中移除资源
-            if (value.objs.Count <= 0)
-            {
-                Addressables.ClearDependencyCacheAsync(value.assets);
-                m_DicAssets.Remove(f_Key);
-            }
-        }
-        public async UniTask UnloadAsync<TKey>(TKey f_Key, EAssetLable f_Lable, GameObject f_Obj)
-            where TKey : struct
-        {
-            var dicKey = GetAssetKey(f_Key, f_Lable);
-            await UnloadAsync(dicKey, f_Obj);
-        }
-
-        public async UniTask UnloadAllAsync()
-        {
-            UniTask[] tasks = new UniTask[m_DicAssets.Count];
-            int index = 0;
-            foreach (var item in m_DicAssets)
-            {
-                tasks[index++] = UniTask.Create(async () =>
-                    {
-                        await UnloadAsync(item.Key, null);
-                    });
-                
-            }
-            m_DicAssets = new();
-            await UniTask.WhenAll(tasks);
-        }
+        
+        #endregion
     }
 }

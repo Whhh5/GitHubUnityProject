@@ -6,6 +6,7 @@ using B1.UI;
 using System.Reflection;
 using UnityEditor.SceneManagement;
 using System;
+using B1;
 
 public class UIAppPlaneWindow : EditorWindow
 {
