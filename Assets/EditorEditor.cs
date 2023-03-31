@@ -1,13 +1,14 @@
 
 using System;
-    using System.Reflection;
-    using UnityEngine;
-    using UnityEditor;
-    using UnityEngine.UIElements;
+using System.Reflection;
+using UnityEngine;
+using UnityEditor;
+using UnityEngine.UIElements;
 using B1;
 using System.Collections.Generic;
 using B1.UI;
 using Cysharp.Threading.Tasks;
+using Object = UnityEngine.Object;
 
 [InitializeOnLoad]
 public static class EditorEditor
@@ -71,7 +72,7 @@ public static class EditorEditor
 
 
 
-public class DebugerWindow: EditorWindow
+public class DebugerWindow : EditorWindow
 {
     private void OnGUI()
     {
@@ -90,6 +91,17 @@ public class DebugerWindow: EditorWindow
             if (!EditorWindow.GetWindow<UIWindowManagerWindow>())
             {
                 var window = EditorWindow.CreateWindow<UIWindowManagerWindow>();
+                window.Show();
+            }
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button(new GUIContent("Property Window", EditorGUIUtility.FindTexture("PlayButton"))))
+        {
+            if (!EditorWindow.GetWindow<PropertyWindow>())
+            {
+                var window = EditorWindow.CreateWindow<PropertyWindow>();
                 window.Show();
             }
         }
@@ -222,7 +234,7 @@ public class UIWindowManagerWindow : EditorWindow
     Vector2 m_ScrollV2Pos = Vector2.zero;
     Vector2 m_ScrollV2Pos2 = Vector2.zero;
     int m_LastCount = 0;
-    EUIWindowPage m_search =  EUIWindowPage.None;
+    EUIWindowPage m_search = EUIWindowPage.None;
     private void OnGUI()
     {
         if (UIWindowManager.Instance != null && m_PageStack == null)
@@ -273,12 +285,12 @@ public class UIWindowManagerWindow : EditorWindow
             EditorGUILayout.BeginVertical();
             foreach (var element in windowStack.GetEnumerator())
             {
-                var window = getWindow.Invoke(item.Value, new object[] { element.Value })  as UIWindow;
+                var window = getWindow.Invoke(item.Value, new object[] { element.Value }) as UIWindow;
 
                 EditorGUILayout.BeginHorizontal();
 
                 EditorGUILayout.LabelField($"\t[{element.Key}] = ", GUILayout.Width(100));
-                EditorGUILayout.ObjectField(window, window.GetType());
+                EditorGUILayout.ObjectField(window, window?.GetType());
 
                 EditorGUILayout.EndHorizontal();
             }
@@ -288,6 +300,112 @@ public class UIWindowManagerWindow : EditorWindow
         }
 
         EditorGUILayout.EndHorizontal();
+
+
+
+        EditorGUILayout.EndScrollView();
+    }
+}
+
+
+
+
+
+
+public class PropertyWindow : EditorWindow
+{
+    enum EClass
+    {
+        None,
+        UIWindow,
+        UILobby,
+        
+    }
+
+    private void OnInspectorUpdate()
+    {
+        Repaint();
+    }
+
+
+    Vector2 m_ScrollV2Pos = Vector2.zero;
+    Vector2 m_ScrollV2Pos2 = Vector2.zero;
+
+
+
+    EClass m_ClassType = EClass.None;
+    Object m_Class = null;
+    Type m_Type = null;
+    private void OnGUI()
+    {
+        m_ScrollV2Pos = EditorGUILayout.BeginScrollView(m_ScrollV2Pos, GUILayout.Width(position.width), GUILayout.Height(position.height));
+
+        EditorGUILayout.BeginHorizontal();
+        var typeStr = EditorGUILayout.TextField($"{m_Type}");
+        m_ClassType = (EClass)EditorGUILayout.EnumPopup(m_ClassType);
+        EditorGUILayout.EndHorizontal();
+
+        m_Type = Type.GetType(m_ClassType.ToString());
+        if (m_Type == null)
+        {
+            m_Type = Type.GetType(typeStr);
+        }
+        if (m_Type != null)
+        {
+            m_Class = EditorGUILayout.ObjectField(m_Class, m_Type);
+
+            if (m_Class != null)
+            {
+                var curType = m_Type;
+                do
+                {
+                    EditorGUILayout.Space(20);
+                    EditorGUILayout.LabelField($" ---- {curType} ----- ");
+
+                    var fields = curType.GetFields(
+                            BindingFlags.IgnoreCase
+                            | BindingFlags.DeclaredOnly
+                            | BindingFlags.Instance
+                            | BindingFlags.Static
+                            | BindingFlags.Public
+                            | BindingFlags.NonPublic
+                            | BindingFlags.FlattenHierarchy
+                            | BindingFlags.InvokeMethod
+                            | BindingFlags.CreateInstance
+                            | BindingFlags.GetField
+                            | BindingFlags.SetField
+                            | BindingFlags.GetProperty
+                            | BindingFlags.SetProperty
+                            | BindingFlags.PutDispProperty
+                            | BindingFlags.PutRefDispProperty
+                            | BindingFlags.ExactBinding
+                            | BindingFlags.SuppressChangeType
+                            | BindingFlags.OptionalParamBinding
+                            | BindingFlags.IgnoreReturn
+                            | BindingFlags.DoNotWrapExceptions
+                        );
+
+                    foreach (var field in fields)
+                    {
+                        var value = field.GetValue(m_Class);
+
+                        EditorGUILayout.BeginHorizontal();
+
+                        EditorGUILayout.LabelField(field.Name, GUILayout.Width(100));
+                        EditorGUILayout.LabelField($"{value}", GUILayout.Width(100));
+
+
+                        EditorGUILayout.EndHorizontal();
+                    }
+
+                    curType = curType.BaseType;
+
+                } while (curType != null);
+
+
+            }
+        }
+
 
 
 

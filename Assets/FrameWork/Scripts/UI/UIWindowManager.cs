@@ -12,6 +12,7 @@ namespace B1.UI
     public sealed class UIWindowManager : MonoSingleton<UIWindowManager>
     {
         private DicStack<Type, UIWindowPage> m_PageStack = new("UI Window Stack Info");
+        private Dictionary<Type, UIWindowPage> m_DicPage = new();
 
         protected override void Awake()
         {
@@ -43,60 +44,64 @@ namespace B1.UI
         public async UniTask<T> OpenPageAsync<T>() where T : UIWindowPage, new()
         {
             var key = typeof(T);
-            if (!m_PageStack.TryGetValue(key, out var value))
+            if (!PageIsExistAsync(key))
             {
                 T window = new();
-                m_PageStack.Push(key, window);
+                m_DicPage.Add(key, window);
                 Log($"开始加载 UI Window Page    page name = {typeof(T)}");
                 await window.InitAsync();
             }
             else
             {
-                Log($"重复开启 UI Window Page 已经被打开  key = {key}   value = {value}");
+                Log($"重复开启 UI Window Page 已经被打开  key = {key} ");
             }
-            return m_PageStack[key] as T;
+
+            return m_DicPage[key] as T;
         }
         /// <summary>
-        /// 打开一个 page
+        /// 打开一个 page, 该方式可加入 page 栈中
         /// </summary>
         /// <param name="f_Type"></param>
         /// <returns></returns>
-        private async UniTask OpenPageAsync(Type f_Type)
+        private async UniTask<UIWindowPage> OpenPageAsync(Type f_Type)
         {
             await UniTask.Delay(0);
+            UIWindowPage page = null;
             if (f_Type == null)
             {
                 LogError($"传入参数为空    f_Type = {f_Type}");
-                return;
+                return page;
             }
 
-            if (!m_PageStack.TryGetValue(f_Type, out var value))
+            if (!PageIsExistAsync(f_Type))
             {
                 var window = Activator.CreateInstance(f_Type);
                 m_PageStack.Push(f_Type, window as UIWindowPage);
                 Log($"开始加载 UI Window Page    page name = {f_Type}");
                 var method_InitAsync = f_Type.GetMethod("InitAsync", BindingFlags.Default | BindingFlags.Instance | BindingFlags.Public);
                 method_InitAsync.Invoke(window, new object[] { });
+                page = window as UIWindowPage;
             }
             else
             {
-                Log($"重复开启 UI Window Page 已经被打开  key = {f_Type}   value = {value}");
+                Log($"重复开启 UI Window Page 已经被打开  key = {f_Type}   value = {f_Type}");
             }
+            return page;
         }
         /// <summary>
-        /// 打开一个 page
+        /// 打开一个 page, 该方式不会加入到 page 栈中
         /// </summary>
         /// <param name="f_EUIWindowPage"></param>
         /// <returns></returns>
-        public async UniTask OpenPageAsync(EUIWindowPage f_EUIWindowPage)
+        public async UniTask<UIWindowPage> OpenPageAsync(EUIWindowPage f_EUIWindowPage)
         {
             var type = Type.GetType(f_EUIWindowPage.ToString());
             if (type == null)
             {
                 LogError($"打开 page 失败    类型不存在    f_EUIWindowPage = {f_EUIWindowPage}     type = {type}");
-                return;
+                return null;
             }
-            await OpenPageAsync(type);
+            return await OpenPageAsync(type);
         }
         /// <summary>
         /// 关闭栈顶 page
@@ -109,6 +114,39 @@ namespace B1.UI
                 await value.CloseAsync();
             }
         }
+        public async UniTask ClosePageAsync<T>() where T : UIWindowPage
+        {
+            var type = typeof(T);
+            if (m_DicPage.TryGetValue(type, out var page))
+            {
+                await page.CloseAsync();
+                m_DicPage.Remove(type);
+            }
+            else
+            {
+                Log($"当前 page 未打开 type = {type}");
+            }
+        }
+        /// <summary>
+        /// 获取一个 page
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public async UniTask<T> GetPageAsync<T>(EUIWindowPage f_Page) where T : UIWindowPage
+        {
+            await UniTask.Delay(0);
+            Type type = Type.GetType(f_Page.ToString());
+            T retPage = null;
+            if (m_PageStack.TryGetValue(type, out var page) && page != null && page as T != null)
+            {
+                retPage = page as T;
+            }
+            else
+            {
+                Log($"获取 UI Window Page 失败 type = {typeof(T)}");
+            }
+            return retPage;
+        }
         /// <summary>
         /// 获取一个 page
         /// </summary>
@@ -117,8 +155,9 @@ namespace B1.UI
         public async UniTask<T> GetPageAsync<T>() where T : UIWindowPage
         {
             await UniTask.Delay(0);
-            T retPage = default(T);
-            if (m_PageStack.TryGetValue(typeof(T), out var page) && page != null && page as T != null)
+            Type type = typeof(T);
+            T retPage = null;
+            if (m_DicPage.TryGetValue(type, out var page) && page != null && page as T != null)
             {
                 retPage = page as T;
             }
@@ -140,6 +179,10 @@ namespace B1.UI
         {
             await UniTask.Delay(0);
             return transform.Find($"{f_EUIRoot}");
+        }
+        private bool PageIsExistAsync(Type f_Type)
+        {
+            return m_PageStack.TryGetValue(f_Type, out var value) || m_DicPage.ContainsKey(f_Type);
         }
         #endregion
 

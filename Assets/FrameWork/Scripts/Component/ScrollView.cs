@@ -8,28 +8,58 @@ using UnityEngine.UI;
 namespace B1.UI
 {
     [RequireComponent(typeof(ScrollRect))]
-    public class ScrollView : MonoBehaviour
+    public class ScrollView : MonoBase
     {
-        public ScrollRect m_Scroll => GetComponent<ScrollRect>();
-        public RectTransform m_Rect => GetComponent<RectTransform>();
-        public RectTransform m_Item = null;
-        Action m_UpdateCallback = null;
+        public ScrollRect Scroll => GetComponent<ScrollRect>();
+        public RectTransform Rect => GetComponent<RectTransform>();
 
-        public async UniTask InitAsync(Action f_Callback)
+
+        public ScrollViewListItem m_Item = null;
+
+        private Action<int, ScrollViewListItem> m_ItemCallback = null;
+
+        private List<ScrollViewListItem> m_ItemList = new();
+
+        protected override void Awake()
         {
-
+            base.Awake();
+            m_Item?.gameObject.SetActive(false);
         }
-        public async UniTask SetListDataAsync<T>(List<T> f_Data)
+        public async UniTask InitData(Action<int, ScrollViewListItem> f_ItemCallback)
         {
-
+            m_ItemCallback = f_ItemCallback;
+            await DelayAsync();
         }
-        public async UniTask UpdateListAsync()
+        public async UniTask CreateList(int f_Count)
         {
+            if (m_Item == null) return;
+            await CloseAsync();
 
+            for (int i = 0; i < f_Count; i++)
+            {
+                var index = i;
+                var item = GameObject.Instantiate(m_Item, m_Item.transform.parent);
+                item.gameObject.SetActive(true);
+                m_ItemCallback?.Invoke(index, item);
+            }
         }
         public async UniTask CloseAsync()
         {
+            UniTask[] tasks = new UniTask[m_ItemList.Count];
 
+
+            for (int i = 0; i < m_ItemList.Count; i++)
+            {
+                var tempItem = m_ItemList[i];
+                tasks[i] = UniTask.Create(async () =>
+                {
+                    await tempItem.OnDestroyAsync();
+                    GameObject.Destroy(tempItem.gameObject);
+                });
+            }
+            m_ItemList.Clear();
+
+            await UniTask.WhenAll(tasks);
         }
     }
 }

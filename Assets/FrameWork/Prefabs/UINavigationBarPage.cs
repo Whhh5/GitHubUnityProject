@@ -13,7 +13,7 @@ public class UINavigationBarPage : UIWindowPage
     {
         return new List<EAssetName>()
         {
-            EAssetName.UILobbyNavigationBar
+            EAssetName.UINavigationBar
         };
     }
 }

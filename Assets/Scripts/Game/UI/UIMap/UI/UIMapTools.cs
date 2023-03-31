@@ -161,6 +161,7 @@ public enum EUIMapDGIDType
     ShowFlagPointInfoTypeWindow,
     ChangMapScaleTo,
     UpdateFlagStateByUIMapSatus,
+    Button3DOnMouseEnter,
     EnumCount,
 }
 

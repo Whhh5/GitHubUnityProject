@@ -103,7 +103,7 @@ namespace B1
                 {
                     await com.OnDestroyAsync();
                 }
-                GameObject.Destroy(f_Obj);
+                GameObject.Destroy(f_Obj.gameObject);
 
 
                 await UnloadAsync(f_Asset, f_Lable, insID);
@@ -215,7 +215,7 @@ namespace B1
                     result = true;
                     obj = GameObject.Instantiate<T>(com, f_Parent);
                     m_DicAssets.Add(dicKey, (typeof(T), true, asset, new()));
-                    m_DicAssets[dicKey].objs.Add(obj.gameObject.GetInstanceID(), obj.gameObject);
+                    m_DicAssets[dicKey].objs.Add(obj.GetInstanceID(), obj.gameObject);
                     LogWarning($"加载预制体实例化成功   Component = {typeof(T)}   path = {dicKey}");
                 }
                 else

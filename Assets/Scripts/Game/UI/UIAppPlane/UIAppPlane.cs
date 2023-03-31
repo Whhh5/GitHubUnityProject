@@ -1,44 +1,64 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using B1;
 using B1.UI;
 using Cysharp.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIAppPlane : UIWindow
 {
     [SerializeField]
-    private Button m_OpenLobbyBtn = null;
-
+    private ScrollView m_ScrollView = null;
+    [SerializeField]
+    private Button m_ChangeStatus = null;
     public override async UniTask AwakeAsync()
     {
         await DelayAsync();
-        m_OpenLobbyBtn.onClick.AddListener(async () => await UIWindowManager.Instance.OpenPageAsync<UILobbyPage>());
+        await m_ScrollView.InitData((index, item) =>
+            {
+                var data = m_List[index];
+
+                var tex_Name = item.GetCom<TextMeshProUGUI>(EUIElementName.Tex_Name);
+                tex_Name.text = data.ToString();
+
+                var btn_OpenPage = item.GetCom<Button>();
+                btn_OpenPage.onClick.AddListener(async () =>
+                    {
+                        await UIWindowManager.Instance.OpenPageAsync(data);
+                    });
+
+            });
+
+
+
+        m_ChangeStatus.onClick.AddListener(() =>
+            {
+                m_ScrollView.gameObject.SetActive(!m_ScrollView.gameObject.activeSelf);
+            });
     }
 
     public override async UniTask OnShowAsync()
     {
         await DelayAsync();
+        await m_ScrollView.CreateList(m_List.Count);
 
     }
     public override async UniTask ShowAsync()
     {
         await base.ShowAsync();
+
     }
 
     public override async UniTask HideAsync()
     {
         await base.HideAsync();
+        await m_ScrollView.CloseAsync();
     }
 
-    protected override void OnDestroy()
-    {
-        m_OpenLobbyBtn.onClick.RemoveAllListeners();
 
-
-        base.OnDestroy();
-    }
 
     #region Data
     [SerializeField, HideInInspector]
@@ -87,6 +107,11 @@ public class UIAppPlane : UIWindow
             m_List.RemoveAt(index);
             m_ListIsSelect.RemoveAt(index);
         }
+    }
+    public void Clear()
+    {
+        m_List.Clear();
+        m_ListIsSelect.Clear();
     }
 
     #endregion

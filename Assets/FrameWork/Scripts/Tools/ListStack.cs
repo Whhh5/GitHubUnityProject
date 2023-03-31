@@ -160,6 +160,18 @@ public class DicStack<TKey, TValue> : Base
         }
         return isTry;
     }
+    public bool TryGetTopValue(out TValue f_Value)
+    {
+        var tryValue = false;
+        f_Value = default;
+        if (m_KeyStack.TryValue(out var key))
+        {
+            f_Value = m_Dic[key];
+            tryValue = true;
+        }
+        
+        return tryValue;
+    }
     public void LogData()
     {
         string str = $"{m_Message}";

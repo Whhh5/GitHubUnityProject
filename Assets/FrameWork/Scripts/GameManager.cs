@@ -14,8 +14,11 @@ namespace B1
         public static async void StartGame()
         {
             await AssetsManager.Instance.LoadPrefabAsync<UGUISystem>(EAssetName.UGUISystem, null);
-            await UIWindowManager.Instance.OpenPageAsync<UILobbyPage>();
 
+
+            await UIWindowManager.Instance.OpenPageAsync(EUIWindowPage.UILobbyPage);
+            await UIWindowManager.Instance.OpenPageAsync<UIAppPlanePage>();
+            await UIWindowManager.Instance.OpenPageAsync<UINavigationBarPage>();
 
         }
     }

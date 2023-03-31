@@ -110,4 +110,22 @@ namespace B1
         /// <returns></returns>
         UniTask OnDestroyAsync();
     }
+    public enum EUIElementName
+    {
+        None,
+
+
+        Tex_Name,
+        Tex_Dec,
+        Tex_Num,
+
+
+        Img_Icon,
+        Img_Bg,
+
+        Btn_Close,
+        Btn_Play,
+        Btn_Change,
+
+    }
 }

@@ -128,7 +128,7 @@ public class UIMapManager : MonoBehaviour
     /// </summary>
     [SerializeField]
     private RectTransform m_RectScroll;
-    private ScrollRect m_MapScroll => m_RectScroll.GetComponent<ScrollRect>();
+    private ScrollRect2 m_MapScroll => m_RectScroll.GetComponent<ScrollRect2>();
     /// <summary>
     /// ╣ьм╪©Лузуж╡Ц
     /// </summary>

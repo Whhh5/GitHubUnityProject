@@ -60,7 +60,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7310ae6264829740a247051dca59e56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_CurentPageType: 0
+  m_AppRoot: 4
   m_BtnRetreat: {fileID: 8321398976709062364}
   m_BtnAdvace: {fileID: 5521827509104315509}
 --- !u!225 &8368004366744501582

@@ -7,10 +7,14 @@ using UnityEngine.UI;
 
 namespace B1.UI
 {
-    public class ScrollViewListItem : MonoBehaviour
+    public class ScrollViewListItem : MonoBase, IOnDestroyAsync
     {
         public RectTransform m_Rect => GetComponent<RectTransform>();
 
+        public async UniTask OnLoadAsync()
+        {
+
+        }
         private void OnBecameVisible()
         {
             Debug.Log(" 当前可见 ");
@@ -18,6 +22,20 @@ namespace B1.UI
         private void OnBecameInvisible()
         {
             Debug.Log(" 当前不可见 ");
+        }
+        public T GetCom<T>(EUIElementName f_Child = EUIElementName.None) where T : Component
+        {
+            Transform tran = null;
+            switch (f_Child)
+            {
+                case EUIElementName.None:
+                    tran = m_Rect;
+                    break;
+                default:
+                    tran = m_Rect.Find(f_Child.ToString());
+                    break;
+            }
+            return tran?.GetComponent<T>();
         }
 
         public async UniTask<(bool result, T component)> GetValueAsync<T>(EScrollViewListItem f_EScrollViewListItem)
@@ -52,6 +70,12 @@ namespace B1.UI
                 isTry = true;
             }
             return isTry;
+        }
+
+
+        public async UniTask OnDestroyAsync()
+        {
+            
         }
     }
 }

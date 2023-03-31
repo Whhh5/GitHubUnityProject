@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using B1;
+using UnityEngine.AddressableAssets;
 
 public class UILobby : UIWindow
 {
@@ -16,11 +17,13 @@ public class UILobby : UIWindow
     public Image m_TestImage = null;
 
 
-
     public override async UniTask AwakeAsync()
     {
         await DelayAsync();
         m_Button.onClick.AddListener(OnClickAsync);
+
+
+
 
     }
 

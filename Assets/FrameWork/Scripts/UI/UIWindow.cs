@@ -10,6 +10,12 @@ namespace B1.UI
     [RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
     public abstract class UIWindow : MonoBase, IAppRoot, IOnDestroyAsync
     {
+        enum EDOTweenID
+        {
+            Show,
+        }
+
+
         #region 变量
         public CanvasGroup CanvasGroup => GetComponent<CanvasGroup>();
         public RectTransform Rect => GetComponent<RectTransform>();
@@ -32,7 +38,8 @@ namespace B1.UI
         public async UniTask OnLoadAsync()
         {
             await DelayAsync();
-            CanvasGroup.blocksRaycasts = CanvasGroup.interactable = false;
+            CanvasGroup.interactable = false;
+            CanvasGroup.alpha = 0;
         }
         /// <summary>
         /// 将会在实体被创建时初始化 首先被调用
@@ -50,20 +57,28 @@ namespace B1.UI
         /// <returns></returns>
         public virtual async UniTask ShowAsync()
         {
+            DOTween.Kill(EDOTweenID.Show);
             await OnShowAsync();
+
+
+            var curLocalSscale = Rect.localScale;
+            var curAlpha = CanvasGroup.alpha;
+            var moveTime = Vector3.Distance(Vector3.one, curLocalSscale) * 0.2f;
             await DOTween.To(() => 0.0f, (value) =>
             {
-                CanvasGroup.alpha = value;
-                Rect.localScale = Vector3.one * value + Vector3.one * m_StartValue * (1 - value);
-            }, 1, m_DGTime)
+                CanvasGroup.alpha = Mathf.Lerp(curAlpha, 1, value);
+                Rect.localScale = Vector3.one * Mathf.Lerp(curLocalSscale.x, 1, value);
+
+            }, 1, moveTime)
                 .SetEase(Ease.InOutBack)
+                .SetId(EDOTweenID.Show)
                 .OnStart(()=>
                 {
                     gameObject.SetActive(true);
                 })
                 .OnComplete(()=>
                 {
-                    CanvasGroup.blocksRaycasts = CanvasGroup.interactable = true;
+                    CanvasGroup.interactable = true;
                 });
         }
         /// <summary>
@@ -72,19 +87,27 @@ namespace B1.UI
         /// <returns></returns>
         public virtual async UniTask HideAsync()
         {
+            DOTween.Kill(EDOTweenID.Show);
+
+            var curLocalSscale = Rect.localScale.x;
+            var curAlpha = CanvasGroup.alpha;
+            var moveTime = (curLocalSscale - 0.5f) * 0.2f;
             await DOTween.To(() => 0.0f, (value) =>
             {
-                CanvasGroup.alpha = value;
-                Rect.localScale = Vector3.one * m_StartValue * value + Vector3.one * m_StartValue * value;
-            }, 1, m_DGTime)
+                CanvasGroup.alpha = Mathf.Lerp(curAlpha, 0, value);
+                Rect.localScale = Vector3.one * Mathf.Lerp(curLocalSscale, 0.5f, value);
+
+            }, 1, moveTime)
                 .SetEase(Ease.InOutBack)
+                .SetId(EDOTweenID.Show)
                 .OnStart(() =>
                 {
-                    CanvasGroup.blocksRaycasts = CanvasGroup.interactable = false;
+                    CanvasGroup.interactable = false;
                 })
                 .OnComplete(() =>
                 {
                     gameObject.SetActive(false);
+                    Rect.localScale = Vector3.one;
                 });
         }
         /// <summary>

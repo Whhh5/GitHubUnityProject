@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class ScrollRect : ScrollRectBase
+public class ScrollRect2 : ScrollRectBase
 {
     [SerializeField]
     private RectTransform m_ScaleObject = null;

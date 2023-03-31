@@ -21,27 +21,27 @@ public class ScrollViewEditor : Editor
     {
         if (GUILayout.Button("Init"))
         {
-            m_Target.m_Scroll.viewport = m_Target.m_Rect.Find("Viewport") != null ?
-                m_Target.m_Rect.Find("Viewport").GetComponent<RectTransform>() :
-                new GameObject("Viewport").AddComponent<RectTransform>();
-            m_Target.m_Scroll.content = m_Target.m_Scroll.viewport.Find("Content") != null ?
-                m_Target.m_Rect.Find("Content").GetComponent<RectTransform>() :
-                new GameObject("Content").AddComponent<RectTransform>();
-            m_Target.m_Item = m_Target.m_Scroll.content.Find("ListItem") != null ?
-                m_Target.m_Rect.Find("ListItem").GetComponent<RectTransform>() :
-                new GameObject("ListItem").AddComponent<RectTransform>();
-            m_Target.m_Scroll.viewport.SetParent(m_Target.transform);
-            m_Target.m_Scroll.content.SetParent(m_Target.m_Scroll.viewport);
-            m_Target.m_Item.SetParent(m_Target.m_Scroll.content);
-            m_Target.m_Scroll.viewport.gameObject.AddComponent<Image>();
-            m_Target.m_Scroll.viewport.gameObject.AddComponent<Mask>().showMaskGraphic = false;
-            m_Target.m_Item.gameObject.AddComponent<ScrollViewListItem>();
-            m_Target.m_Item.gameObject.AddComponent<Image>();
-            m_Target.m_Scroll.viewport.NormalFullScene();
-            m_Target.m_Item.Normalize();
+            //m_Target.Scroll.viewport = m_Target.Rect.Find("Viewport") != null ?
+            //    m_Target.Rect.Find("Viewport").GetComponent<RectTransform>() :
+            //    new GameObject("Viewport").AddComponent<RectTransform>();
+            //m_Target.Scroll.content = m_Target.Scroll.viewport.Find("Content") != null ?
+            //    m_Target.Rect.Find("Content").GetComponent<RectTransform>() :
+            //    new GameObject("Content").AddComponent<RectTransform>();
+            //var Item = m_Target.Scroll.content.Find("ListItem") != null ?
+            //    m_Target.Rect.Find("ListItem").GetComponent<RectTransform>() :
+            //    new GameObject("ListItem").AddComponent<RectTransform>();
+            //m_Target.Scroll.viewport.SetParent(m_Target.transform);
+            //m_Target.Scroll.content.SetParent(m_Target.Scroll.viewport);
+            //m_Target.m_Item.transform.SetParent(m_Target.Scroll.content);
+            //m_Target.Scroll.viewport.gameObject.AddComponent<Image>();
+            //m_Target.Scroll.viewport.gameObject.AddComponent<Mask>().showMaskGraphic = false;
+            //m_Target.m_Item = Item.gameObject.AddComponent<ScrollViewListItem>();
+            //m_Target.m_Item.gameObject.AddComponent<Image>();
+            //m_Target.Scroll.viewport.NormalFullScene();
+            //m_Target.m_Item.transform.Normalize();
 
-            EditorUtility.SetDirty(m_Target);
-            AssetDatabase.SaveAssets();
+            //EditorUtility.SetDirty(m_Target);
+            //AssetDatabase.SaveAssets();
         }
         base.OnInspectorGUI();
     }

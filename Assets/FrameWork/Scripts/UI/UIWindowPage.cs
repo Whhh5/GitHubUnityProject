@@ -25,8 +25,7 @@ namespace B1.UI
             {
                 Debug.Log($"当前配置类型获取失败   请到  EUIWindowPage 中注册");
             }
-            CurPage = (EUIWindowPage)fieldInfo.GetValue(null);
-
+            //CurPage = (EUIWindowPage)fieldInfo.GetValue(null);
 
             // 加载 UI window 窗口
             var windowList = GetWindowNameAsync();
@@ -201,7 +200,7 @@ namespace B1.UI
         /// <returns></returns>
         public async UniTask CloseAsync()
         {
-            UniTask[] tasks = new UniTask[m_DicWindow.Count];
+            UniTask[] tasks = new UniTask[m_DicWindow.Count + 1];
             uint index = 0;
 
             // 卸载当前 page 窗口
@@ -225,7 +224,7 @@ namespace B1.UI
             }
 
             await UniTask.WhenAll(tasks);
-
+            m_DicWindow.Clear();
         }
     }
 }

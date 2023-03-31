@@ -41,6 +41,10 @@ public class UIAppPlaneWindow : EditorWindow
         GUILayout.Label($"{line}");
         GUILayout.Label($"{lineMaxCount}");
         GUILayout.Label($"{m_ScrollPos}");
+        if (GUILayout.Button("Clear"))
+        {
+            m_Target.Clear();
+        }
         #region 搜索筛选
         GUILayout.Label("搜索 :",
                         new GUILayoutOption[]
