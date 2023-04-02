@@ -5,29 +5,29 @@ using Sirenix.OdinInspector;
 
 
 /// <summary>
-/// Æ·¼¶
+/// Æ·ï¿½ï¿½
 /// </summary>
 public enum EEuality : int
 {
     None = 0,
     /// <summary>
-    /// Ï¡ÓÐ¶È
+    /// Ï¡ï¿½Ð¶ï¿½
     /// </summary>
     Rarity = None + 1 << 0,
     /// <summary>
-    /// ÆÕÍ¨
+    /// ï¿½ï¿½Í¨
     /// </summary>
     Common = Rarity + 1 << 1,
     /// <summary>
-    /// ¸ß¼¶
+    /// ï¿½ß¼ï¿½
     /// </summary>
     Advanced = Common + 1 << 2,
     /// <summary>
-    /// Ï¡ÓÐ
+    /// Ï¡ï¿½ï¿½
     /// </summary>
     Rare = Advanced + 1 << 3,
     /// <summary>
-    /// ´«Ëµ
+    /// ï¿½ï¿½Ëµ
     /// </summary>
     Legend = Rare + 1 << 4,
     /// <summary>
@@ -36,7 +36,7 @@ public enum EEuality : int
     Epic = Legend + Legend + 1 << 5,
 }
 /// <summary>
-/// Ï¡ÓÐ¶È
+/// Ï¡ï¿½Ð¶ï¿½
 /// </summary>
 public enum ERarity : int
 {
@@ -52,35 +52,40 @@ public enum ERarity : int
 public abstract class SkillBase : ScriptableObject
 {
     /// <summary>
-    /// Ãû×Ö
+    /// ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [SerializeField]
     protected string b_Name;
     /// <summary>
-    /// Æ·¼¶
+    /// Æ·ï¿½ï¿½
     /// </summary>
     [SerializeField]
     protected EEuality b_Euality;
     /// <summary>
-    /// Ï¡ÓÐ¶È
+    /// Ï¡ï¿½Ð¶ï¿½
     /// </summary>
     [SerializeField]
     protected ERarity b_Rarity;
     /// <summary>
-    /// ÀäÈ´Ê±¼ä
+    /// ï¿½ï¿½È´Ê±ï¿½ï¿½
     /// </summary>
     [SerializeField]
     protected float b_CollingTime;
     /// <summary>
-    /// ÔªËØ
+    /// Ôªï¿½ï¿½
     /// </summary>
     [SerializeField]
     protected float b_ChemicalElement;
     /// <summary>
-    /// ¹¥»÷Ä¿±ê²ã¼¶
+    /// ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ã¼¶
     /// </summary>
     [SerializeField]//[SerializeField, EnumToggleButtons]
     protected LayerMask b_AttackLayer;
 
+
+
+
+    public abstract void StartExecute();
+    public abstract void StopExecube();
 
 }

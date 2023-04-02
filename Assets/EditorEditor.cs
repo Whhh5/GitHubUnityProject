@@ -62,9 +62,11 @@ public static class EditorEditor
                 window.Show();
             }
         }
-        if (GUILayout.Button(new GUIContent("Wram-up setup", EditorGUIUtility.FindTexture("PlayButton"))))
+        if (GUILayout.Button(new GUIContent("My Node Editor", EditorGUIUtility.FindTexture("PlayButton"))))
         {
-            Debug.Log("Wram-up setup");
+            var window = EditorWindow.GetWindow<MyNodeEditor>();
+
+            window.titleContent = new GUIContent("My Node Editor");
         }
         GUILayout.EndHorizontal();
     }
@@ -410,5 +412,91 @@ public class PropertyWindow : EditorWindow
 
 
         EditorGUILayout.EndScrollView();
+    }
+}
+
+public class BehaviourWindow: EditorWindow
+{
+    private void OnInspectorUpdate()
+    {
+        Repaint();
+    }
+
+
+
+
+    Vector2 m_ScrollPoint;
+    Vector2 ViewSize => position.size;
+
+
+    
+    private void OnGUI()
+    {
+
+        EditorGUILayout.BeginHorizontal(); // 1
+
+
+
+        m_ScrollPoint = EditorGUILayout.BeginScrollView(m_ScrollPoint, GUILayout.Width(ViewSize.x), GUILayout.Height(ViewSize.y)); // 1 - 1
+
+
+        EditorGUILayout.BeginVertical(); //  1 - 1 - 1
+
+
+        if (GUILayout.Button("Create Point"))
+        {
+
+        }
+
+
+        //EditorGUILayout.b
+
+
+
+
+        EditorGUILayout.EndVertical(); // 1 - 1 - 1
+
+
+
+        EditorGUILayout.EndScrollView(); // 1 - 1
+
+
+
+
+
+
+
+        m_ScrollPoint = EditorGUILayout.BeginScrollView(m_ScrollPoint, GUILayout.Width(ViewSize.x), GUILayout.Height(ViewSize.y)); // 1 - 2
+
+
+
+        EditorGUILayout.BeginHorizontal(); // 1 - 2 - 1
+
+
+        EditorGUILayout.BeginVertical(); // 1 - 2 - 1 - 1
+
+
+
+
+
+        EditorGUILayout.EndVertical(); // 1 - 2 - 1 - 1
+
+
+        EditorGUILayout.BeginVertical(); //  1 - 2 - 1 - 2
+
+
+        EditorGUILayout.EndVertical(); // 1 - 2 - 1 - 2
+
+
+
+
+        EditorGUILayout.EndHorizontal(); // 1 - 2 - 1
+
+
+
+        EditorGUILayout.EndScrollView(); // 1 - 2
+
+
+        EditorGUILayout.BeginVertical(); // 1
     }
 }

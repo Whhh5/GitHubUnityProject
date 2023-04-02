@@ -12,3 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 762fffa3c2ea27348a99a11820a45004, type: 3}
   m_Name: Skill_Sorcerer
   m_EditorClassIdentifier: 
+  b_Name: 
+  b_Euality: 0
+  b_Rarity: 0
+  b_CollingTime: 0
+  b_ChemicalElement: 0
+  b_AttackLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Tran: {fileID: 0}
+  m_Item: {fileID: 0}
+  m_ItemMat: {fileID: 2100000, guid: e5e7d5dbc8fb34adfb530e5e4e6a4149, type: 2}
+  m_ItemCount: 20
+  m_IntervalTime: 0.1
+  m_Speed: 1
+  m_Radius: 5
