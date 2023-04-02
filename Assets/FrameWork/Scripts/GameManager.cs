@@ -16,9 +16,9 @@ namespace B1
             await AssetsManager.Instance.LoadPrefabAsync<UGUISystem>(EAssetName.UGUISystem, null);
 
 
-            await UIWindowManager.Instance.OpenPageAsync(EUIWindowPage.UILobbyPage);
             await UIWindowManager.Instance.OpenPageAsync<UIAppPlanePage>();
             await UIWindowManager.Instance.OpenPageAsync<UINavigationBarPage>();
+            await UIWindowManager.Instance.OpenPageAsync(EUIWindowPage.UILobbyPage);
 
         }
     }

@@ -17,10 +17,23 @@ MonoBehaviour:
     NodeName: NodeGraph.StartNode
     Position:
       serializedVersion: 2
-      x: 200
-      y: 200
-      width: 150
-      height: 100
-  _dialogNodeDatas: []
+      x: 177
+      y: 190
+      width: 76
+      height: 77
+  _dialogNodeDatas:
+  - GUID: 4d561860-20de-48a2-a7ff-1e1ebfd4117c
+    NodeName: DialogNode
+    Position:
+      serializedVersion: 2
+      x: 343
+      y: 170
+      width: 261
+      height: 97
+    content: adasdadasdada
   _npcNodeDatas: []
-  links: []
+  links:
+  - BaseNodeGUID: 
+    OutputPortName: Output
+    TargetNodeGUID: 4d561860-20de-48a2-a7ff-1e1ebfd4117c
+    TargetPortName: Input

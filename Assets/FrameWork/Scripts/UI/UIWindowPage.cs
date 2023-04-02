@@ -76,7 +76,7 @@ namespace B1.UI
             {
                 Log("UIPage 打开失败  未获取到当前 page 的窗口   请重写函数并返回 GetWindowNameAsync()");
             }
-
+            Awa_Msg();
         }
         /// <summary>
         /// 先是一个可以入栈的窗口
@@ -119,7 +119,7 @@ namespace B1.UI
             if (m_DicWindow.TryGetValue(f_Window, out var value))
             {
                 await value.ShowAsync();
-                EventManager.Instance.FireEvent(EEvent.UI_WINDOW_HIDE, value, f_Window.ToString());
+                MessagingSystem.Instance.SendEvent(EEvent.UI_WINDOW_HIDE, value, f_Window.ToString());
             }
             else
             {
@@ -136,7 +136,7 @@ namespace B1.UI
             if (m_DicWindow.TryGetValue(f_Window, out var value))
             {
                 await value.HideAsync();
-                EventManager.Instance.FireEvent(EEvent.UI_WINDOW_HIDE, value, f_Window.ToString());
+                MessagingSystem.Instance.SendEvent(EEvent.UI_WINDOW_HIDE, value, f_Window.ToString());
             }
             else
             {
@@ -200,6 +200,7 @@ namespace B1.UI
         /// <returns></returns>
         public async UniTask CloseAsync()
         {
+            Des_Msg();
             UniTask[] tasks = new UniTask[m_DicWindow.Count + 1];
             uint index = 0;
 
@@ -210,7 +211,7 @@ namespace B1.UI
                 tasks[index++] = UniTask.Create(async () =>
                 {
                     await UIWindowManager.Instance.UnloadWindowAsync(window.Key, window.Value);
-                    EventManager.Instance.FireEvent(EEvent.UI_WINDOW_UNLOAD_FINISH, window.Key, window.Key.ToString());
+                    MessagingSystem.Instance.SendEvent(EEvent.UI_WINDOW_UNLOAD_FINISH, window.Key, window.Key.ToString());
                 });
             }
 
@@ -226,5 +227,42 @@ namespace B1.UI
             await UniTask.WhenAll(tasks);
             m_DicWindow.Clear();
         }
+
+
+
+        private Dictionary<EEvent, List<(object tUserdata, string tDesc)>> m_MsgDic = null;
+
+        #region 消息系统处理
+        private void Awa_Msg()
+        {
+            //消息接口处理
+            var eventSystem = this as IMessageSystem;
+            if (!object.ReferenceEquals(eventSystem, null))
+            {
+                m_MsgDic = eventSystem.SubscribeList();
+                foreach (var item in m_MsgDic)
+                {
+                    var tempItem = item;
+                    foreach (var msg in tempItem.Value)
+                    {
+                        MessagingSystem.Instance.Subscribe(tempItem.Key, eventSystem, msg.tUserdata, msg.tDesc);
+                    }
+                }
+            }
+        }
+        private void Des_Msg()
+        {
+            //消息接口处理
+            if (!object.ReferenceEquals(m_MsgDic, null))
+            {
+                var eventSystem = this as IMessageSystem;
+                foreach (var item in m_MsgDic)
+                {
+                    var tempItem = item;
+                    MessagingSystem.Instance.Unsubscribe(tempItem.Key, eventSystem);
+                }
+            }
+        }
+        #endregion
     }
 }

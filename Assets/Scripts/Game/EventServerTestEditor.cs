@@ -26,11 +26,11 @@ public class EventServerTestEditor : Editor
         EditorGUILayout.EndHorizontal();
         if (GUILayout.Button("Subscribe Event"))
         {
-            EventManager.Instance.Subscribe(EEvent.SCENE_LOAD_START, TestAction, m_Target.m_Layer);
+            //EventManager.Instance.Subscribe(EEvent.SCENE_LOAD_START, TestAction, m_Target.m_Layer);
         }
         if (GUILayout.Button("Unsubscribe Event"))
         {
-            EventManager.Instance.Unsubscribe(EEvent.SCENE_LOAD_START, TestAction, m_Target.m_Layer);
+            //EventManager.Instance.Unsubscribe(EEvent.SCENE_LOAD_START, TestAction, m_Target.m_Layer);
         }
         EditorGUILayout.BeginHorizontal();
         GUILayout.Label("Des");
@@ -40,11 +40,11 @@ public class EventServerTestEditor : Editor
         EditorGUILayout.EndHorizontal();
         if (GUILayout.Button("Fire Event"))
         {
-            EventManager.Instance.FireEvent(EEvent.SCENE_LOAD_START, m_Para, m_Des);
+            MessagingSystem.Instance.SendEvent(EEvent.SCENE_LOAD_START, m_Para, m_Des);
         }
         if (GUILayout.Button("Console Event"))
         {
-            EventManager.Instance.LogEvent();
+            MessagingSystem.Instance.LogEvent();
         }
 
         base.OnInspectorGUI();

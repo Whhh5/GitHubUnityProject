@@ -22,13 +22,9 @@ namespace B1.Event
         UI_WINDOW_HIDE,
         EnumCount,
     }
-    public interface IEventReception<TUserData>
+    public interface IMessageSystem
     {
-        delegate void tyyu();
-        void EventReception(EEvent eEvent)
-        {
-            Debug.Log("2222");
-        }
-        void LLL();
+        Dictionary<EEvent, List<(object tUserdata, string tDesc)>> SubscribeList();
+        void ReceptionEvent(EEvent f_Event, object f_Param, object f_UserData, string f_SubDesc, string f_SendDesc);
     }
 }

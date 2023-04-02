@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using B1.UI;
 using Cysharp.Threading.Tasks;
 using Object = UnityEngine.Object;
+using B1.Event;
 
 [InitializeOnLoad]
 public static class EditorEditor
@@ -107,6 +108,15 @@ public class DebugerWindow : EditorWindow
                 window.Show();
             }
         }
+        if (GUILayout.Button(new GUIContent("Message System", EditorGUIUtility.FindTexture("PlayButton"))))
+        {
+            if (!EditorWindow.GetWindow<MessagingSystemWindow>())
+            {
+                var window = EditorWindow.CreateWindow<MessagingSystemWindow>();
+                window.Show();
+            }
+        }
+
         GUILayout.EndHorizontal();
     }
 
@@ -415,8 +425,11 @@ public class PropertyWindow : EditorWindow
     }
 }
 
-public class BehaviourWindow: EditorWindow
+public class MessagingSystemWindow: EditorWindow
 {
+    MessagingSystem m_Target = null;
+
+
     private void OnInspectorUpdate()
     {
         Repaint();
@@ -432,33 +445,45 @@ public class BehaviourWindow: EditorWindow
     
     private void OnGUI()
     {
+        var target = MessagingSystem.Instance;
+        if (target == null) return;
 
-        EditorGUILayout.BeginHorizontal(); // 1
-
+        var field = typeof(MessagingSystem).GetField("m_DicEvent", BindingFlags.Default | BindingFlags.NonPublic | BindingFlags.Instance);
+        if (field == null) return;
+        var m_DicEvent = field.GetValue(target) as Dictionary<EEvent, Dictionary<IMessageSystem, (object tUserdata, string tDesc)>>;
 
 
         m_ScrollPoint = EditorGUILayout.BeginScrollView(m_ScrollPoint, GUILayout.Width(ViewSize.x), GUILayout.Height(ViewSize.y)); // 1 - 1
 
 
-        EditorGUILayout.BeginVertical(); //  1 - 1 - 1
 
-
-        if (GUILayout.Button("Create Point"))
+        EditorGUILayout.BeginHorizontal();
+        foreach (var item in m_DicEvent)
         {
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.EnumPopup(item.Key);
+
+            foreach (var obj in item.Value)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"\tType:", GUILayout.Width(150));
+                EditorGUILayout.TextField($"{obj.Key}");
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"\tUserData:", GUILayout.Width(150));
+                EditorGUILayout.TextField($"{obj.Value.tUserdata}");
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"\tDesc:", GUILayout.Width(150));
+                EditorGUILayout.TextField($"{obj.Value.tDesc}");
+                EditorGUILayout.EndHorizontal();
+            }
+            EditorGUILayout.EndVertical();
 
         }
-
-
-        //EditorGUILayout.b
-
-
-
-
-        EditorGUILayout.EndVertical(); // 1 - 1 - 1
-
-
-
-        EditorGUILayout.EndScrollView(); // 1 - 1
+        EditorGUILayout.EndHorizontal();
 
 
 
@@ -466,37 +491,6 @@ public class BehaviourWindow: EditorWindow
 
 
 
-        m_ScrollPoint = EditorGUILayout.BeginScrollView(m_ScrollPoint, GUILayout.Width(ViewSize.x), GUILayout.Height(ViewSize.y)); // 1 - 2
-
-
-
-        EditorGUILayout.BeginHorizontal(); // 1 - 2 - 1
-
-
-        EditorGUILayout.BeginVertical(); // 1 - 2 - 1 - 1
-
-
-
-
-
-        EditorGUILayout.EndVertical(); // 1 - 2 - 1 - 1
-
-
-        EditorGUILayout.BeginVertical(); //  1 - 2 - 1 - 2
-
-
-        EditorGUILayout.EndVertical(); // 1 - 2 - 1 - 2
-
-
-
-
-        EditorGUILayout.EndHorizontal(); // 1 - 2 - 1
-
-
-
-        EditorGUILayout.EndScrollView(); // 1 - 2
-
-
-        EditorGUILayout.BeginVertical(); // 1
+        EditorGUILayout.EndScrollView(); // 1
     }
 }
