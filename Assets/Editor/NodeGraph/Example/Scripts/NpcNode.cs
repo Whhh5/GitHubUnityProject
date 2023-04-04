@@ -4,7 +4,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class NpcNode : NodeBase<NpcNode>, INode
+public class NpcNode : NodeBase<NpcNode, NpcNodeData>, INode
 {
     public readonly Vector2 _defaultNodeSize = new Vector2(150,200);
 

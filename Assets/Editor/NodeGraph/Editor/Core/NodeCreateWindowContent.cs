@@ -21,7 +21,7 @@ namespace NodeGraph
             m_Window = window;
             m_NodeGraphView = graphView;
 
-            var editorAssembly = typeof(NodeBase<>).Assembly;
+            var editorAssembly = typeof(NodeBase<,>).Assembly;
             editorAssembly.GetTypes();
             
             nodeTypes = editorAssembly.GetTypes()
@@ -59,7 +59,7 @@ namespace NodeGraph
                 context.screenMousePosition - m_Window.position.position);
             var graphMousePosition = m_NodeGraphView.contentViewContainer.WorldToLocal(mousePosition);
             
-            var editorAssembly = typeof(NodeBase<>).Assembly;
+            var editorAssembly = typeof(NodeBase<,>).Assembly;
             var typeName = (string) SearchTreeEntry.userData;
             var newNode = editorAssembly.CreateInstance(typeName);
             var nodeType = newNode.GetType();

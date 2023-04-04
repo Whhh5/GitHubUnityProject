@@ -1,0 +1,236 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a09e99e754533403a8c8225a40f06062, type: 3}
+  m_Name: NewNodeGraph 1
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: m_TestDataDic
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[System.Type, mscorlib],[System.Collections.Generic.List`1[[System.Object,
+        mscorlib]], mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.ObjectEqualityComparer`1[[System.Type, mscorlib]],
+        mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 2|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: NodeGraph.StartNodeData, Assembly-CSharp-Editor
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 3|System.Collections.Generic.List`1[[System.Object, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 4|NodeGraph.StartNodeData, Assembly-CSharp-Editor
+    - Name: GUID
+      Entry: 6
+      Data: 
+    - Name: NodeName
+      Entry: 1
+      Data: NodeGraph.StartNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 203
+    - Name: 
+      Entry: 4
+      Data: 202
+    - Name: 
+      Entry: 4
+      Data: 76
+    - Name: 
+      Entry: 4
+      Data: 77
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 5|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: TestNode1Data, Assembly-CSharp-Editor
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 6|System.Collections.Generic.List`1[[System.Object, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 7|TestNode1Data, Assembly-CSharp-Editor
+    - Name: GUID
+      Entry: 1
+      Data: 09bfded1-8078-4b31-99b3-806a8128939a
+    - Name: NodeName
+      Entry: 1
+      Data: TestNode1
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 431
+    - Name: 
+      Entry: 4
+      Data: 253
+    - Name: 
+      Entry: 4
+      Data: 175
+    - Name: 
+      Entry: 4
+      Data: 121
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: content
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 8|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: NpcNodeData, Assembly-CSharp-Editor
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 9|System.Collections.Generic.List`1[[System.Object, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 10|NpcNodeData, Assembly-CSharp-Editor
+    - Name: GUID
+      Entry: 1
+      Data: 4c690dfe-ddd6-43a9-91f0-deb20056a0c3
+    - Name: NodeName
+      Entry: 1
+      Data: NpcNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 715
+    - Name: 
+      Entry: 4
+      Data: 316
+    - Name: 
+      Entry: 4
+      Data: 180
+    - Name: 
+      Entry: 4
+      Data: 117
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NpcName
+      Entry: 6
+      Data: 
+    - Name: NpcLevel
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  links:
+  - BaseNodeGUID: 
+    OutputPortName: Output
+    TargetNodeGUID: 09bfded1-8078-4b31-99b3-806a8128939a
+    TargetPortName: Input
+  - BaseNodeGUID: 09bfded1-8078-4b31-99b3-806a8128939a
+    OutputPortName: Output
+    TargetNodeGUID: 4c690dfe-ddd6-43a9-91f0-deb20056a0c3
+    TargetPortName: Input
+  - BaseNodeGUID: 09bfded1-8078-4b31-99b3-806a8128939a
+    OutputPortName: Output
+    TargetNodeGUID: 4c690dfe-ddd6-43a9-91f0-deb20056a0c3
+    TargetPortName: Input

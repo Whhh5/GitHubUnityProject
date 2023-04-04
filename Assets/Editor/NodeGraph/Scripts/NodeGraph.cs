@@ -2,59 +2,56 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 namespace NodeGraph
 {
     [CreateAssetMenu(fileName = "NewNodeGraph", menuName = "NodeGraph/NodeGraph")]
-    public class NodeGraph : ScriptableObject
+    public class NodeGraph : SerializedScriptableObject
     {
-        [SerializeField] private List<StartNodeData> _startNodeDatas = new List<StartNodeData>()
-        {
-            new StartNodeData()
-        };
-        [SerializeField] private List<DialogNodeData> _dialogNodeDatas = new List<DialogNodeData>();
-        [SerializeField] private List<NpcNodeData> _npcNodeDatas = new List<NpcNodeData>();
-        
         [SerializeField] private List<NodeLinkData> links = new List<NodeLinkData>();
         public List<NodeLinkData> Links => links;
 
         public void AddNodeToListFromTypeName(string typeName, object data)
         {
-            if (String.Equals(typeName,typeof(StartNodeData).FullName))
+            var type = Type.GetType(typeName);
+            if (!m_TestDataDic.ContainsKey(type))
             {
-                _startNodeDatas.Add((StartNodeData) data);
+                m_TestDataDic.Add(type, new());
             }
-            else if (String.Equals(typeName,typeof(DialogNodeData).FullName))
-            {
-                _dialogNodeDatas.Add((DialogNodeData) data);
-            }
-            else if (String.Equals(typeName, typeof(NpcNodeData).FullName))
-            {
-                _npcNodeDatas.Add((NpcNodeData) data);
-            }
-            else
-            {
-                throw new Exception($"Node Data Type Name : {typeName} is not defined");
-            }
+
+            m_TestDataDic[type].Add(data);
+
+
+
         }
 
         public List<NodeBaseData> GetAllNodeDatas()
         {
             var list = new List<NodeBaseData>();
-            list = list.Concat(_startNodeDatas.Select<StartNodeData, NodeBaseData>(node => (NodeBaseData) node).ToList()).ToList();
-            list = list.Concat(_dialogNodeDatas.Select<DialogNodeData, NodeBaseData>(node => (NodeBaseData)node).ToList()).ToList();
-            list = list.Concat(_npcNodeDatas.Select<NpcNodeData, NodeBaseData>(node => (NodeBaseData) node).ToList()).ToList();
-            
+
+            if (!m_TestDataDic.ContainsKey(typeof(StartNodeData)))
+            {
+                m_TestDataDic.Add(typeof(StartNodeData), new() { new StartNodeData() });
+            }
+
+
+            foreach (var item in m_TestDataDic)
+            {
+                list = list.Concat(item.Value.Select(node => (NodeBaseData)node).ToList()).ToList();
+            }
             return list;
         }
 
         public void ClearAllNodeDatas()
         {
-            _startNodeDatas.Clear();
-            _dialogNodeDatas.Clear();
-            _npcNodeDatas.Clear();
+            m_TestDataDic.Clear();
             links.Clear();
         }
+
+
+
+        [SerializeField] private Dictionary<Type, List<object>> m_TestDataDic = new();
     }
     
     [Serializable]
@@ -65,4 +62,6 @@ namespace NodeGraph
         public string TargetNodeGUID;
         public string TargetPortName;
     }
+
+
 }

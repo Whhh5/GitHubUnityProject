@@ -5,4 +5,5 @@ using NodeGraph;
 public class DialogNodeData : NodeBaseData
 {
     public string content;
+
 }

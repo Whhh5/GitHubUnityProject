@@ -47,9 +47,9 @@ namespace NodeGraph
 
                     so.Links.Add(new NodeLinkData
                     {
-                        BaseNodeGUID = outputGuidField.GetValue(outputNode).ToString(),
+                        BaseNodeGUID = $"{outputGuidField.GetValue(outputNode)}",
                         OutputPortName = connectedPorts[i].output.portName,
-                        TargetNodeGUID = targetGuidField.GetValue(inputNode).ToString(),
+                        TargetNodeGUID = $"{targetGuidField.GetValue(inputNode)}",
                         TargetPortName = connectedPorts[i].input.portName
                     });
                 }
@@ -70,7 +70,11 @@ namespace NodeGraph
                 string nodeTypeName = nodeNameField.GetValue(node).ToString();
                 dataTypeName = $"{nodeTypeName}Data";
                 var data = runtimeAssembly.CreateInstance(dataTypeName);
-                CopyData(node, data);
+
+                var originalData = node.GetType().GetField("data", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(node);
+
+                CopyData(originalData, data);
+
                 FillPosition(node, data);
                 return data;
             }
@@ -114,7 +118,7 @@ namespace NodeGraph
             {
                 var nodeType = node.GetType();
                 var nodeGuidField = nodeType.GetField("GUID");
-                var guid = nodeGuidField.GetValue(node).ToString();
+                var guid = $"{nodeGuidField.GetValue(node)}";
                 var connections = data.Links?.Where(x => String.Equals(x.BaseNodeGUID, guid))?.ToList();
                 if (connections != null)
                 {
@@ -125,7 +129,7 @@ namespace NodeGraph
                         {
                             var xType = x.GetType();
                             var xGuidField = xType.GetField("GUID");
-                            var xGuid = xGuidField.GetValue(x).ToString();
+                            var xGuid = $"{xGuidField.GetValue(x)}";
                             return String.Equals(xGuid, targetNodeGuid);
                         });
                         var outputPort = node.outputContainer.Query<Port>().ToList().First(p =>
@@ -152,10 +156,13 @@ namespace NodeGraph
 
         private static object LoadNode(object data,string dataTypeName, NodeGraphView view)
         {
-            var editorAssembly = typeof(NodeBase<>).Assembly;
+            var editorAssembly = typeof(NodeBase<,>).Assembly;
             var node = editorAssembly.CreateInstance(((NodeBaseData) data).NodeName);
-            CopyData(data, node);
-            
+
+
+            var data2 = node.GetType().GetField("data", BindingFlags.NonPublic | BindingFlags.Instance);
+            data2.SetValue(node, data);
+
             var nodeType = node.GetType();
             var onCreated = nodeType.GetMethod("OnCreated");
             onCreated?.Invoke(node, new[] {view});
@@ -177,8 +184,15 @@ namespace NodeGraph
         {
             var dataSourceType = dataSource.GetType();
             var dataTargetType = dataTarget.GetType();
-            var dataSourceFields = dataSourceType.GetFields().ToDictionary<FieldInfo, string>(p => p.Name);;
+            var dataSourceFields = dataSourceType.GetFields().ToDictionary<FieldInfo, string>(p => p.Name);
             var dataTargetFields = dataTargetType.GetFields().ToDictionary<FieldInfo, string>(p => p.Name);
+
+
+
+            //var field = dataTargetType.BaseType.GetField("data", BindingFlags.NonPublic | BindingFlags.Instance);
+            //field.SetValue(dataTarget, dataSource);
+
+
             foreach (var sourceField in dataSourceFields)
             {
                 if (dataTargetFields.ContainsKey(sourceField.Key))

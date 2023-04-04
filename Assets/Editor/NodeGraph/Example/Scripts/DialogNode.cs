@@ -4,7 +4,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class DialogNode : NodeBase<DialogNode>, INode
+public class DialogNode : NodeBase<DialogNode, DialogNodeData>, INode
 {
     public readonly Vector2 _defaultNodeSize = new Vector2(150,200);
     public string content;
@@ -27,6 +27,7 @@ public class DialogNode : NodeBase<DialogNode>, INode
         
         var outputPort = GeneratePort(this, Direction.Output, typeof(string));
         outputPort.portName = "Output";
+        outputPort.portType = typeof(int);
         outputContainer.Add(outputPort);
         
         RefreshExpandedState();

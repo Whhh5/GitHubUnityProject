@@ -1,10 +1,11 @@
+using NodeGraph;
 using System;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace NodeGraph
 {
-    public class StartNode :NodeBase<StartNode>
+    public class StartNode :NodeBase<StartNode, StartNodeData>
     {
         public readonly Vector2 _defaultNodeSize = new Vector2(150,200);
 
